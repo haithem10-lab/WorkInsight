@@ -1,0 +1,42 @@
+<section class="card">
+  <div class="header">
+    <div>
+      <h1>Offres extraites</h1>
+      <p class="subtitle">Historique des extractions réalisées par la plateforme.</p>
+    </div>
+    <button type="button" (click)="refresh()">Actualiser</button>
+  </div>
+
+  <p *ngIf="isLoading" class="info">Chargement des offres...</p>
+  <p *ngIf="!isLoading && errorMessage" class="error">{{ errorMessage }}</p>
+  <p *ngIf="!isLoading && !errorMessage && offers.length === 0" class="info">
+    Aucune offre disponible pour le moment.
+  </p>
+
+  <div *ngIf="offers.length" class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Poste</th>
+          <th>Entreprise</th>
+          <th>Localisation</th>
+          <th>Email</th>
+          <th>Compétences</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let offer of offers">
+          <td>{{ offer.title || 'N/A' }}</td>
+          <td>{{ offer.company || 'N/A' }}</td>
+          <td>{{ offer.location || 'N/A' }}</td>
+          <td>{{ offer.contactEmail || 'N/A' }}</td>
+          <td>
+            <span *ngFor="let skill of (offer.skills || []); let last = last">
+              {{ skill }}<span *ngIf="!last">, </span>
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

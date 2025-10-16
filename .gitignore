@@ -1,0 +1,15 @@
+node_modules/
+.DS_Store
+.env
+backend/target/
+frontend/dist/
+*.zip
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.exe
+*.dll
+*.ico
+*.jar
+*.class
