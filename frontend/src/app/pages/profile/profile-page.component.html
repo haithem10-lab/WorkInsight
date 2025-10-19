@@ -1,0 +1,152 @@
+<section class="profile-shell">
+  <div class="profile-card" *ngIf="user$ | async as user; else guestView">
+    <div class="profile-header">
+      <div class="avatar">{{ user.fullName?.charAt(0) || user.email.charAt(0) }}</div>
+      <div class="details">
+        <h1>{{ user.fullName || user.email }}</h1>
+        <p>{{ user.email }}</p>
+        <span class="plan-badge">Free trial</span>
+      </div>
+      <div class="header-actions">
+        <button type="button" (click)="navigate('/upload')">Submit extraction</button>
+        <button type="button" class="secondary" (click)="navigate('/results')">View results</button>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <div class="status-row" *ngIf="loading">
+        <span class="muted">Fetching your activity...</span>
+      </div>
+      <div class="status-row error" *ngIf="!loading && errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <section class="summary-grid" *ngIf="stats">
+        <article class="summary-card">
+          <span class="label">Total extractions</span>
+          <strong>{{ stats.totalOffers }}</strong>
+          <small>All time</small>
+        </article>
+        <article class="summary-card">
+          <span class="label">This week</span>
+          <strong>{{ stats.offersThisWeek }}</strong>
+          <small>Past 7 days</small>
+        </article>
+        <article class="summary-card">
+          <span class="label">Average confidence</span>
+          <strong>{{ averageConfidence }}</strong>
+          <small>Across recent jobs</small>
+        </article>
+        <article class="summary-card">
+          <span class="label">Last extraction</span>
+          <strong>{{ lastExtractionLabel }}</strong>
+          <small>Keep new submissions coming</small>
+        </article>
+      </section>
+
+      <section class="panels">
+        <div class="panel" *ngIf="stats; else emptyStats">
+          <header>
+            <h2>Source breakdown</h2>
+            <p>Where your jobs originate</p>
+          </header>
+          <ul class="source-list" *ngIf="sourceBreakdown.length; else noSources">
+            <li *ngFor="let item of sourceBreakdown">
+              <span>{{ item.label }}</span>
+              <span>{{ item.value }} - {{ item.percentage }}%</span>
+            </li>
+          </ul>
+          <ng-template #noSources>
+            <p class="muted">No submissions recorded yet.</p>
+          </ng-template>
+        </div>
+
+        <div class="panel">
+          <header>
+            <h2>Preferences</h2>
+            <p>Tune defaults for faster submissions</p>
+          </header>
+          <div class="toggle-list">
+            <label>
+              <input type="checkbox" [checked]="settings.preferPdf" (change)="toggleSetting('preferPdf')" />
+              Auto-select PDF uploads
+            </label>
+            <label>
+              <input type="checkbox" [checked]="settings.preferImage" (change)="toggleSetting('preferImage')" />
+              Enable screenshot imports
+            </label>
+            <label>
+              <input type="checkbox" [checked]="settings.preferUrl" (change)="toggleSetting('preferUrl')" />
+              Enable URL capture by default
+            </label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <header>
+            <h2>Notifications</h2>
+            <p>Stay informed about results</p>
+          </header>
+          <div class="toggle-list">
+            <label>
+              <input type="checkbox" [checked]="settings.alertLowConfidence" (change)="toggleSetting('alertLowConfidence')" />
+              Alert me when confidence &lt; 60%
+            </label>
+            <label>
+              <input type="checkbox" [checked]="settings.weeklyDigest" (change)="toggleSetting('weeklyDigest')" />
+              Send a weekly extraction digest
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <ng-template #emptyStats>
+        <div class="panel muted-panel">
+          <h2>No activity yet</h2>
+          <p class="muted">Run your first extraction to see metrics here.</p>
+        </div>
+      </ng-template>
+
+      <section class="recent-panel">
+        <header>
+          <h2>Recent extractions</h2>
+          <button type="button" class="link" (click)="navigate('/results')">View all</button>
+        </header>
+        <ul class="recent-list" *ngIf="recentOffers.length; else noRecent">
+          <li *ngFor="let offer of recentOffers">
+            <div>
+              <strong>{{ offer.title || 'Untitled offer' }}</strong>
+              <span class="meta">
+                {{ offer.sourceType || 'Manual' }} -
+                {{ offer.createdAt ? (offer.createdAt | date: 'medium') : 'Pending' }}
+              </span>
+            </div>
+            <span class="confidence" [class.low]="(offer.confidenceScore ?? 0) < 0.6">
+              {{ offer.confidenceScore ? (offer.confidenceScore * 100 | number: '1.0-0') + '%' : 'n/a' }}
+            </span>
+          </li>
+        </ul>
+        <ng-template #noRecent>
+          <p class="muted">Your latest extractions will appear here once you run them.</p>
+        </ng-template>
+      </section>
+    </div>
+
+    <div class="profile-footer">
+      <button type="button" class="logout" (click)="signOut()">Logout</button>
+    </div>
+  </div>
+
+  <ng-template #guestView>
+    <div class="profile-card empty">
+      <h2>You are not signed in</h2>
+      <p>
+        Create an account or sign in to access your saved extractions and update your profile.
+      </p>
+      <div class="profile-actions">
+        <button type="button" (click)="navigate('/signup')">Create account</button>
+        <button type="button" class="secondary" (click)="navigate('/signin')">Sign in</button>
+      </div>
+    </div>
+  </ng-template>
+</section>

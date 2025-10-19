@@ -1,10 +1,111 @@
-<header class="navbar">
-  <div class="brand">
-    <span class="logo">🧠</span>
-    <span class="title">WorkInsight</span>
+<header class="navbar" [class.scrolled]="scrolled" [class.hidden]="navHidden">
+  <div class="navbar-inner">
+    <a routerLink="/" class="brand" (click)="closeMobileMenus()">
+      <span class="logo">WI</span>
+      <span class="title">WorkInsight</span>
+    </a>
+
+    <button class="mobile-toggle" type="button" (click)="toggleMobileMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <nav class="nav-links" [class.open]="mobileMenuOpen">
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a
+            routerLink="/"
+            fragment="home"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            (click)="closeMobileMenus()"
+          >
+            Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            routerLink="/"
+            fragment="about"
+            routerLinkActive="active"
+            (click)="closeMobileMenus()"
+          >
+            About
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            routerLink="/"
+            fragment="features"
+            routerLinkActive="active"
+            (click)="closeMobileMenus()"
+          >
+            Features
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            routerLink="/"
+            fragment="workflow"
+            routerLinkActive="active"
+            (click)="closeMobileMenus()"
+          >
+            Workflow
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            routerLink="/"
+            fragment="templates"
+            routerLinkActive="active"
+            (click)="closeMobileMenus()"
+          >
+            Templates
+          </a>
+        </li>
+
+      </ul>
+
+      <ng-container *ngIf="currentUser$ | async as user; else mobileGuestActions">
+        <div class="mobile-user-actions">
+          <button type="button" (click)="navigateTo('/profile')">Profile</button>
+          <button type="button" (click)="navigateTo('/results')">Results</button>
+          <button type="button" class="logout" (click)="logout()">Logout</button>
+        </div>
+      </ng-container>
+      <ng-template #mobileGuestActions>
+        <div class="mobile-actions">
+          <a routerLink="/signin" class="login" (click)="closeMobileMenus()">Login</a>
+          <a routerLink="/signup" class="cta" (click)="closeMobileMenus()">Start for free</a>
+        </div>
+      </ng-template>
+    </nav>
+
+    <ng-container *ngIf="currentUser$ | async as user; else desktopGuestActions">
+      <div class="actions logged-in">
+        <button type="button" class="avatar-button" (click)="toggleUserMenu($event)">
+          <span class="avatar-initial">{{ getUserInitial(user) }}</span>
+          <span class="avatar-name">{{ getUserGreeting(user) }}</span>
+          <span class="chevron chevron--small" [class.open]="userMenuOpen">
+            <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+              <path d="M5.75 7.5L10 11.75L14.25 7.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+        </button>
+        <div class="user-dropdown" *ngIf="userMenuOpen" (click)="$event.stopPropagation()">
+          <button type="button" (click)="navigateTo('/profile')">Profile</button>
+          <button type="button" (click)="navigateTo('/results')">Results</button>
+          <hr />
+          <button type="button" class="logout" (click)="logout()">Logout</button>
+        </div>
+      </div>
+    </ng-container>
+    <ng-template #desktopGuestActions>
+      <div class="actions">
+        <a routerLink="/signin" class="login">Login</a>
+        <a routerLink="/signup" class="cta">Start for free</a>
+      </div>
+    </ng-template>
   </div>
-  <nav class="links">
-    <a routerLink="/upload" routerLinkActive="active">Extraction</a>
-    <a routerLink="/results" routerLinkActive="active">Résultats</a>
-  </nav>
 </header>

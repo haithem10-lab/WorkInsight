@@ -1,42 +1,188 @@
-<section class="card">
+<section class="dashboard">
   <div class="header">
     <div>
-      <h1>Offres extraites</h1>
-      <p class="subtitle">Historique des extractions réalisées par la plateforme.</p>
+      <h1>Tableau de bord</h1>
+      <p class="subtitle">Suivi des extractions en temps reel. Derniere mise a jour {{ lastRefreshLabel }}.</p>
     </div>
-    <button type="button" (click)="refresh()">Actualiser</button>
+    <button type="button" (click)="refresh()" [disabled]="isLoading">
+      {{ isLoading ? 'Chargement...' : 'Actualiser' }}
+    </button>
   </div>
 
-  <p *ngIf="isLoading" class="info">Chargement des offres...</p>
   <p *ngIf="!isLoading && errorMessage" class="error">{{ errorMessage }}</p>
-  <p *ngIf="!isLoading && !errorMessage && offers.length === 0" class="info">
-    Aucune offre disponible pour le moment.
-  </p>
 
-  <div *ngIf="offers.length" class="table-wrapper">
-    <table>
-      <thead>
-        <tr>
-          <th>Poste</th>
-          <th>Entreprise</th>
-          <th>Localisation</th>
-          <th>Email</th>
-          <th>Compétences</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let offer of offers">
-          <td>{{ offer.title || 'N/A' }}</td>
-          <td>{{ offer.company || 'N/A' }}</td>
-          <td>{{ offer.location || 'N/A' }}</td>
-          <td>{{ offer.contactEmail || 'N/A' }}</td>
-          <td>
-            <span *ngFor="let skill of (offer.skills || []); let last = last">
-              {{ skill }}<span *ngIf="!last">, </span>
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="metrics-grid" *ngIf="stats">
+    <article class="metric-card">
+      <span class="metric-label">Total offres</span>
+      <strong class="metric-value">{{ stats.totalOffers }}</strong>
+      <span class="metric-hint">Depuis le lancement</span>
+    </article>
+    <article class="metric-card">
+      <span class="metric-label">Aujourd hui</span>
+      <strong class="metric-value">{{ stats.offersToday }}</strong>
+      <span class="metric-hint">Nouvelles extractions</span>
+    </article>
+    <article class="metric-card">
+      <span class="metric-label">7 derniers jours</span>
+      <strong class="metric-value">{{ stats.offersThisWeek }}</strong>
+      <span class="metric-hint">Activite hebdomadaire</span>
+    </article>
+    <article class="metric-card">
+      <span class="metric-label">Confiance moyenne</span>
+      <strong class="metric-value">{{ stats.averageConfidence | number: '1.0-2' }}</strong>
+      <span class="metric-hint">Score 0 a 1</span>
+    </article>
   </div>
+
+  <div class="panel-grid" *ngIf="stats">
+    <section class="panel">
+      <header>
+        <h2>Activite des 7 derniers jours</h2>
+        <span class="panel-hint">Nombre d offres finalisees par jour</span>
+      </header>
+      <ul class="trend-list">
+        <li *ngFor="let item of dailyTrend">
+          <span class="trend-label">{{ item.label }}</span>
+          <div class="trend-bar">
+            <div class="trend-fill" [style.width.%]="(item.count / maxDailyCount) * 100"></div>
+          </div>
+          <span class="trend-value">{{ item.count }}</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <header>
+        <h2>Repartition des sources</h2>
+        <span class="panel-hint">Origine des soumissions</span>
+      </header>
+      <ul class="breakdown-list">
+        <li *ngFor="let entry of sourceBreakdown">
+          <span class="label">{{ entry.label }}</span>
+          <span class="value">{{ entry.value }}</span>
+          <span class="percentage">{{ entry.percentage }}%</span>
+        </li>
+        <li *ngIf="!sourceBreakdown.length" class="empty">Aucune donnee pour le moment.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <header>
+        <h2>Top entreprises</h2>
+        <span class="panel-hint">Classement par offres capturees</span>
+      </header>
+      <ul class="breakdown-list">
+        <li *ngFor="let entry of topCompanies">
+          <span class="label">{{ entry.label }}</span>
+          <span class="value">{{ entry.value }}</span>
+          <span class="percentage">{{ entry.percentage }}%</span>
+        </li>
+        <li *ngIf="!topCompanies.length" class="empty">Pas encore de classement.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <header>
+        <h2>Competences frequentes</h2>
+        <span class="panel-hint">Mots clefs les plus detectes</span>
+      </header>
+      <ul class="chips">
+        <li *ngFor="let entry of topSkills">
+          <span class="chip">{{ entry.label }} <small>{{ entry.value }}</small></span>
+        </li>
+        <li *ngIf="!topSkills.length" class="empty">En attente de donnees.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="card">
+    <div class="card-header">
+      <h2>Offres extraites</h2>
+      <span class="panel-hint">Detail des enregistrements recents</span>
+    </div>
+
+    <div class="table-controls">
+      <div class="search-box">
+        <input
+          type="search"
+          placeholder="Rechercher une offre, une entreprise ou une competence..."
+          [value]="searchTerm"
+          (input)="onSearch($any($event.target).value)"
+        />
+      </div>
+      <span class="sort-hint">Cliquez sur les colonnes pour trier</span>
+    </div>
+
+    <p *ngIf="isLoading" class="info">Chargement des offres...</p>
+    <p *ngIf="!isLoading && !offers.length" class="info">Aucune offre disponible pour le moment.</p>
+    <p *ngIf="!isLoading && offers.length && !filteredOffers.length" class="info">
+      Aucune offre ne correspond a votre recherche.
+    </p>
+
+    <div *ngIf="filteredOffers.length" class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th (click)="toggleSort('title')" class="sortable" [class.active]="sortColumn === 'title'">
+              Poste
+              <span class="sort-indicator" *ngIf="sortColumn === 'title'">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th (click)="toggleSort('company')" class="sortable" [class.active]="sortColumn === 'company'">
+              Entreprise
+              <span class="sort-indicator" *ngIf="sortColumn === 'company'">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th>Source</th>
+            <th>Localisation</th>
+            <th>Email</th>
+            <th>Competences</th>
+            <th (click)="toggleSort('confidenceScore')" class="sortable" [class.active]="sortColumn === 'confidenceScore'">
+              Confiance
+              <span class="sort-indicator" *ngIf="sortColumn === 'confidenceScore'">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th>Statut</th>
+            <th (click)="toggleSort('createdAt')" class="sortable" [class.active]="sortColumn === 'createdAt'">
+              Cree le
+              <span class="sort-indicator" *ngIf="sortColumn === 'createdAt'">
+                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              </span>
+            </th>
+            <th class="actions-heading">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let offer of filteredOffers; trackBy: trackById">
+            <td>{{ offer.title || 'N/A' }}</td>
+            <td>{{ offer.company || 'N/A' }}</td>
+            <td>{{ offer.sourceType || 'Inconnu' }}</td>
+            <td>{{ offer.location || 'N/A' }}</td>
+            <td>{{ offer.contactEmail || 'N/A' }}</td>
+            <td>
+              <span *ngFor="let skill of (offer.skills || []); let last = last">
+                {{ skill }}<span *ngIf="!last">, </span>
+              </span>
+            </td>
+            <td>{{ offer.confidenceScore | number: '1.0-2' }}</td>
+            <td>{{ offer.status || 'COMPLETED' }}</td>
+            <td>{{ offer.createdAt ? (offer.createdAt | date: 'shortDate') : 'N/A' }}</td>
+            <td class="actions-col">
+              <button
+                type="button"
+                class="delete-button"
+                (click)="deleteOffer(offer)"
+                [disabled]="deletingId === offer.id"
+              >
+                {{ deletingId === offer.id ? 'Suppression...' : 'Supprimer' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 </section>

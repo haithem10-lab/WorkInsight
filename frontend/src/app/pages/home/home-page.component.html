@@ -1,0 +1,242 @@
+<section class="hero" id="home">
+  <div class="hero-copy">
+    <h1>
+      Bring every job offer into
+      <span class="highlight">one intelligent workspace</span>
+    </h1>
+    <p class="lead">
+      WorkInsight ingests PDFs, screenshots, spreadsheets, and career site links, then turns them into structured data
+      ready for sourcing, outreach, and reporting across your hiring stack.
+    </p>
+    <div class="cta-row">
+      <button routerLink="/signup" class="primary">Start extracting</button>
+      <button routerLink="/signin" class="ghost">Connect my workspace</button>
+    </div>
+    <div class="support-row">
+      <button routerLink="/upload" class="text-link">See supported formats</button>
+      <span class="hint">or review the end-to-end workflow below</span>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="pulse-ring"></div>
+    <div class="orb"></div>
+    <div class="orb orb--secondary"></div>
+    <div class="card">
+      <h3>Live extraction preview</h3>
+      <ul>
+        <li>
+          <span class="label">Source</span>
+          <span class="value">Career page</span>
+        </li>
+        <li>
+          <span class="label">Matches</span>
+          <span class="value">182 profiles</span>
+        </li>
+        <li>
+          <span class="label">Confidence</span>
+          <span class="value good">0.91</span>
+        </li>
+      </ul>
+      <div class="sparkline">
+        <div class="bar" style="height: 40%"></div>
+        <div class="bar" style="height: 75%"></div>
+        <div class="bar" style="height: 55%"></div>
+        <div class="bar" style="height: 90%"></div>
+        <div class="bar" style="height: 65%"></div>
+        <div class="bar" style="height: 82%"></div>
+      </div>
+    </div>
+    <div class="floating-tag">Unify job data</div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <h2>Why talent teams rely on WorkInsight</h2>
+  <p class="subtitle">
+    Purpose-built for operations, campus hiring, and agency teams that need reliable data from every job source.
+  </p>
+  <div class="grid">
+    <article *ngFor="let feature of featureColumns" class="feature-card">
+      <h3>{{ feature.title }}</h3>
+      <p>{{ feature.description }}</p>
+    </article>
+  </div>
+</section>
+
+<section class="use-cases" id="about">
+  <div class="section-heading">
+    <span class="eyebrow">Practical examples</span>
+    <h2>Actionable insights across every hiring channel.</h2>
+    <p>
+      Upload job packs from email, drag in screenshots from the field, or sync with career portals. Push clean data to
+      Sheets, CRMs, or automation tools in minutes.
+    </p>
+  </div>
+  <div class="example-grid">
+    <article *ngFor="let example of practicalExamples" class="example-card">
+      <div class="icon" [attr.data-icon]="example.icon">
+        <ng-container [ngSwitch]="example.icon">
+          <svg *ngSwitchCase="'star'" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 3.4l1.94 4.24 4.66.41-3.53 3.08 1.06 4.73L12 13.96l-4.13 1.9 1.06-4.73-3.53-3.08 4.66-.41L12 3.4z"
+              stroke-linejoin="round"
+              stroke-width="1.2"
+              fill="none"
+              stroke="currentColor"
+            ></path>
+          </svg>
+          <svg *ngSwitchCase="'camera'" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="6.5" width="17" height="12" rx="2.25" fill="none" stroke="currentColor" stroke-width="1.2"></rect>
+            <path d="M8 6.5l1.2-2h5.6l1.2 2" stroke="currentColor" stroke-width="1.2" fill="none" stroke-linecap="round"></path>
+            <circle cx="12" cy="12.5" r="3.2" fill="none" stroke="currentColor" stroke-width="1.2"></circle>
+          </svg>
+          <svg *ngSwitchCase="'grid'" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="4" width="6.5" height="6.5" rx="1.5" stroke="currentColor" fill="none" stroke-width="1.2"></rect>
+            <rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5" stroke="currentColor" fill="none" stroke-width="1.2"></rect>
+            <rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5" stroke="currentColor" fill="none" stroke-width="1.2"></rect>
+            <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5" stroke="currentColor" fill="none" stroke-width="1.2"></rect>
+          </svg>
+          <svg *ngSwitchDefault viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M12 4.5v15m7.5-7.5h-15m12.5-5.5l-2.5 2.5m0 8l2.5 2.5m-10-13l2.5 2.5m0 8l-2.5 2.5"
+              stroke="currentColor"
+              stroke-width="1.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              fill="none"
+            ></path>
+          </svg>
+        </ng-container>
+      </div>
+      <h3>{{ example.title }}</h3>
+      <p>{{ example.description }}</p>
+    </article>
+  </div>
+</section>
+
+<section class="workflow" id="workflow">
+  <div class="workflow-media">
+    <div class="workflow-screen">
+      <div class="screen-header">
+        <span>Select a text to capture or press <strong>Esc</strong> to cancel</span>
+      </div>
+      <div class="screen-body">
+        <div class="screen-list">
+          <div class="list-item" *ngFor="let row of [1,2,3,4]">
+            <div class="avatar">{{ row }}</div>
+            <div class="meta">
+              <div class="title">Visible Text HTML</div>
+              <div class="subtitle">
+                <span class="chip">Design Tools</span>
+                <span class="chip">Web Design</span>
+              </div>
+            </div>
+            <span class="rating">4.8</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="workflow-copy">
+    <span class="eyebrow">Automation flow</span>
+    <h2>Turn messy job inputs into structured candidate signals.</h2>
+    <p>
+      Map your parsing logic once, add enrichment rules, and let WorkInsight validate requirements, benefits, skills, and
+      compensation before syncing it to downstream systems.
+    </p>
+    <div class="workflow-steps">
+      <article class="workflow-step" *ngFor="let step of automationSteps">
+        <span class="step-label">{{ step.label }}</span>
+        <p>{{ step.description }}</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="robots" id="templates">
+  <div class="section-heading">
+    <span class="eyebrow">Import accelerators</span>
+    <h2>Extract job data in under 2 minutes.</h2>
+    <p>
+      Skip manual setup with templates that handle the most common formats your team receives every day.
+    </p>
+  </div>
+  <div class="robot-grid">
+    <article *ngFor="let robot of robotTemplates" class="robot-card" [class.robot-card--primary]="robot.cta === 'View more'">
+      <div class="robot-logo" [attr.data-name]="robot.name">
+        <span>{{ robot.logo }}</span>
+      </div>
+      <h3>{{ robot.name }}</h3>
+      <p>{{ robot.description }}</p>
+      <ul class="format-list">
+        <li *ngFor="let format of robot.formats">{{ format }}</li>
+      </ul>
+      <button type="button" class="robot-cta">
+        {{ robot.cta }}
+        <span aria-hidden="true">-&gt;</span>
+      </button>
+    </article>
+  </div>
+</section>
+
+<section class="faq">
+  <div class="section-heading">
+    <h2>Frequently asked questions</h2>
+    <p>Everything you need to know about how WorkInsight accelerates recruiting operations.</p>
+  </div>
+  <div class="faq-list">
+    <article
+      *ngFor="let faq of faqs; let i = index"
+      class="faq-item"
+      [class.faq-item--open]="openFaqIndex === i"
+    >
+      <button type="button" (click)="toggleFaq(i)">
+        <span>{{ faq.question }}</span>
+        <span class="icon" aria-hidden="true">{{ openFaqIndex === i ? '-' : '+' }}</span>
+      </button>
+      <p *ngIf="openFaqIndex === i">{{ faq.answer }}</p>
+    </article>
+  </div>
+</section>
+
+<section class="home-footer">
+  <div class="columns">
+    <div class="column brand">
+      <div class="logo">WI</div>
+      <p>WorkInsight transforms every internship and job offer into trusted, structured data for hiring teams.</p>
+    </div>
+    <div class="column">
+      <h4>Solutions</h4>
+      <ul>
+        <li><a routerLink="/product/studio">Multi-format import</a></li>
+        <li><a routerLink="/product/connectors">System connectors</a></li>
+        <li><a routerLink="/use-cases/recruiting">Recruiting analytics</a></li>
+        <li><a routerLink="/pricing">Plans & pricing</a></li>
+      </ul>
+    </div>
+    <div class="column">
+      <h4>Resources</h4>
+      <ul>
+        <li><a routerLink="/resources/docs">Help center</a></li>
+        <li><a routerLink="/resources/blog">Blog</a></li>
+        <li><a routerLink="/resources/stories">Customer stories</a></li>
+        <li><a routerLink="/signup">Schedule a demo</a></li>
+      </ul>
+    </div>
+    <div class="column">
+      <h4>Stay in the loop</h4>
+      <p>Subscribe for product updates, tutorials, and recruiting playbooks.</p>
+      <form class="newsletter">
+        <input type="email" placeholder="Enter your email" aria-label="Email address" />
+        <button type="button">Subscribe</button>
+      </form>
+    </div>
+  </div>
+  <div class="footnote">
+    <span>&copy; {{ currentYear }} WorkInsight Inc.</span>
+    <div class="links">
+      <a routerLink="/privacy">Privacy policy</a>
+      <a routerLink="/terms">Terms of service</a>
+    </div>
+  </div>
+</section>

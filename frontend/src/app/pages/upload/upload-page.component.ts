@@ -2,7 +2,9 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ExtractionApiService } from '../../services/extraction-api.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ExtractionApiService, NO_ACTIVE_USER_ERROR } from '../../services/extraction-api.service';
+import { AuthSessionService } from '../../services/auth-session.service';
 
 @Component({
   selector: 'app-upload-page',
@@ -15,6 +17,7 @@ export class UploadPageComponent {
   private readonly fb = inject(FormBuilder);
   private readonly api = inject(ExtractionApiService);
   private readonly router = inject(Router);
+  private readonly session = inject(AuthSessionService);
 
   statusMessage = '';
   isSubmitting = false;
@@ -32,6 +35,13 @@ export class UploadPageComponent {
 
   async submit(): Promise<void> {
     if (this.isSubmitting) {
+      return;
+    }
+
+    const userId = this.session.getCurrentUserId();
+    if (!userId) {
+      this.statusMessage = 'Connectez-vous pour lancer une extraction.';
+      await this.router.navigate(['/signin']);
       return;
     }
 
@@ -54,12 +64,21 @@ export class UploadPageComponent {
       if (url) {
         payload.append('url', url);
       }
-      await this.api.submitExtraction(payload);
-      this.statusMessage = 'Extraction terminée !';
+      const job = await this.api.submitExtraction(payload);
+      const label = job?.title ?? 'Offre';
+      this.statusMessage = `Extraction terminee. ${label} enregistree.`;
       this.router.navigate(['/results']);
     } catch (error) {
-      console.error(error);
-      this.statusMessage = "Une erreur est survenue lors de l'extraction.";
+      if (error instanceof HttpErrorResponse) {
+        this.statusMessage = 'Le serveur na pas pu traiter cette extraction.';
+      } else if (error instanceof Error && error.message === NO_ACTIVE_USER_ERROR) {
+        this.statusMessage = 'Session expirée. Connectez-vous a nouveau.';
+        this.session.clear();
+        await this.router.navigate(['/signin']);
+      } else {
+        console.error(error);
+        this.statusMessage = 'Une erreur est survenue lors de lextraction.';
+      }
     } finally {
       this.isSubmitting = false;
     }

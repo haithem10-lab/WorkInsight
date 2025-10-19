@@ -1,0 +1,41 @@
+<section class="auth-shell">
+  <div class="card">
+    <span class="badge">Recruiting intelligence</span>
+    <div class="header">
+      <h1>Welcome back</h1>
+      <p>Sign in to orchestrate data collection across every job source in your workflow.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label class="field">
+        <span>Email</span>
+        <input type="email" placeholder="you@company.com" formControlName="email" />
+        <small *ngIf="form.controls.email.invalid && form.controls.email.touched">Enter a valid email.</small>
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input type="password" placeholder="Minimum 6 characters" formControlName="password" />
+        <small *ngIf="form.controls.password.invalid && form.controls.password.touched">
+          Password must contain at least 6 characters.
+        </small>
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" formControlName="remember" />
+        <span>Remember me</span>
+      </label>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Signing in...' : 'Sign in' }}
+      </button>
+    </form>
+
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+    <div class="footer">
+      <span>New to WorkInsight?</span>
+      <a routerLink="/signup">Create an account</a>
+    </div>
+  </div>
+</section>

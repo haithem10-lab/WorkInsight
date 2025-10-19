@@ -4,20 +4,24 @@
 }
 
 .navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 40;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  width: 100%;
   --nav-text: #f8fafc;
-  --nav-text-muted: rgba(248, 250, 255, 0.82);
-  --nav-hover: #7dd3fc;
-  --nav-border: rgba(148, 163, 184, 0.12);
-  --nav-cta-start: #38bdf8;
-  --nav-cta-end: #6366f1;
-  background: linear-gradient(180deg, rgba(10, 17, 38, 0.85), rgba(10, 17, 38, 0.35));
+  --nav-text-muted: rgba(226, 232, 240, 0.82);
+  --nav-hover: #a5b4ff;
+  --nav-border: rgba(148, 163, 184, 0.16);
+  --nav-cta-start: #6366f1;
+  --nav-cta-end: #0ea5e9;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(14, 165, 233, 0.12));
   backdrop-filter: blur(18px);
   color: var(--nav-text);
-  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid var(--nav-border);
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.35s ease;
+  will-change: transform, background, box-shadow;
 }
 
 .navbar::after {
@@ -27,20 +31,22 @@
   right: 0;
   bottom: 0;
   height: 2px;
-  background: linear-gradient(90deg, rgba(125, 211, 252, 0), rgba(125, 211, 252, 0.75), rgba(125, 211, 252, 0));
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0), rgba(14, 165, 233, 0.45), rgba(99, 102, 241, 0));
   pointer-events: none;
 }
 
 .navbar.scrolled {
   --nav-text: #0f172a;
-  --nav-text-muted: #1f2a44;
-  --nav-hover: #2563eb;
-  --nav-border: rgba(148, 163, 184, 0.25);
-  --nav-cta-start: #2563eb;
-  --nav-cta-end: #7c3aed;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
-  border-bottom-color: rgba(148, 163, 184, 0.12);
+  --nav-text-muted: rgba(30, 41, 59, 0.78);
+  --nav-hover: #4f46e5;
+  background: #ffffff;
+  box-shadow: 0 22px 44px rgba(15, 23, 42, 0.14);
+  border-bottom-color: rgba(148, 163, 184, 0.28);
+}
+
+.navbar.hidden {
+  transform: translateY(-110%);
+  box-shadow: none;
 }
 
 .navbar-inner {
@@ -73,23 +79,23 @@
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  background: rgba(125, 211, 252, 0.18);
-  border: 1px solid rgba(125, 211, 252, 0.35);
-  color: #7dd3fc;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.24);
+  color: #6366f1;
   width: 42px;
   height: 42px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 12px;
-  box-shadow: inset 0 0 14px rgba(125, 211, 252, 0.25);
+  box-shadow: inset 0 0 14px rgba(99, 102, 241, 0.18);
   transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
 }
 
 .navbar.scrolled .logo {
-  background: rgba(59, 130, 246, 0.12);
-  border-color: rgba(59, 130, 246, 0.32);
-  color: #2563eb;
+  background: rgba(14, 165, 233, 0.12);
+  border-color: rgba(14, 165, 233, 0.24);
+  color: #0ea5e9;
 }
 
 .title {
@@ -259,19 +265,148 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.7rem 1.7rem;
+  padding: 0.68rem 1.6rem;
   border-radius: 999px;
   font-weight: 600;
   color: #ffffff;
   text-decoration: none;
   background: linear-gradient(135deg, var(--nav-cta-start), var(--nav-cta-end));
-  box-shadow: 0 18px 34px rgba(37, 99, 235, 0.28);
+  box-shadow: 0 16px 32px rgba(99, 102, 241, 0.3);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cta:hover {
   transform: translateY(-1px);
-  box-shadow: 0 22px 42px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 22px 42px rgba(14, 165, 233, 0.35);
+}
+
+.actions.logged-in {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.avatar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid var(--nav-border);
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--nav-text);
+  border-radius: 999px;
+  padding: 0.45rem 0.9rem 0.45rem 0.45rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.navbar.scrolled .avatar-button {
+  background: rgba(226, 232, 240, 0.65);
+}
+
+.avatar-button:hover {
+  border-color: rgba(99, 102, 241, 0.45);
+}
+
+.avatar-initial {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.85), rgba(14, 165, 233, 0.85));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+}
+
+.avatar-name {
+  font-size: 0.95rem;
+  color: inherit;
+}
+
+.chevron--small svg {
+  width: 14px;
+  height: 14px;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 0.85rem);
+  right: 0;
+  min-width: 200px;
+  background: rgba(10, 17, 38, 0.96);
+  border: 1px solid rgba(99, 102, 241, 0.24);
+  border-radius: 16px;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.28);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  animation: fadeIn 0.18s ease forwards;
+  color: #f8fafc;
+}
+
+.navbar.scrolled .user-dropdown {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(148, 163, 184, 0.28);
+  color: #0f172a;
+}
+
+.user-dropdown button {
+  background: none;
+  border: none;
+  border-radius: 12px;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.user-dropdown button:hover {
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.user-dropdown button.logout {
+  color: #f87171;
+}
+
+.user-dropdown hr {
+  border: none;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  margin: 0.35rem 0;
+}
+
+.mobile-user-actions {
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.2rem;
+}
+
+.mobile-user-actions button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  background: rgba(226, 232, 240, 0.2);
+  font-weight: 600;
+  color: #0f172a;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.mobile-user-actions button:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.mobile-user-actions button.logout {
+  border-color: rgba(248, 113, 113, 0.55);
+  color: #b91c1c;
 }
 
 .mobile-actions {
@@ -368,6 +503,10 @@
     flex-direction: column;
     gap: 0.9rem;
     margin-top: 1.2rem;
+  }
+
+  .mobile-user-actions {
+    display: flex;
   }
 
   .mobile-actions .login,

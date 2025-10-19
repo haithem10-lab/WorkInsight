@@ -1,0 +1,51 @@
+<section class="auth-shell">
+  <div class="card">
+    <span class="badge">Free 14-day trial</span>
+    <div class="header">
+      <h1>Create your account</h1>
+      <p>Start automating your recruitment data flows in minutes. No credit card required.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label class="field">
+        <span>Full name</span>
+        <input type="text" placeholder="Taylor Reed" formControlName="fullName" />
+        <small *ngIf="form.controls.fullName.invalid && form.controls.fullName.touched">
+          Please enter your name.
+        </small>
+      </label>
+
+      <label class="field">
+        <span>Email</span>
+        <input type="email" placeholder="you@company.com" formControlName="email" />
+        <small *ngIf="form.controls.email.invalid && form.controls.email.touched">
+          Enter a valid email address.
+        </small>
+      </label>
+
+      <label class="field">
+        <span>Password</span>
+        <input type="password" placeholder="Minimum 6 characters" formControlName="password" />
+        <small *ngIf="form.controls.password.invalid && form.controls.password.touched">
+          Password must contain at least 6 characters.
+        </small>
+      </label>
+
+      <label class="checkbox">
+        <input type="checkbox" formControlName="agree" />
+        <span>I agree to the WorkInsight terms of service.</span>
+      </label>
+
+      <button type="submit" [disabled]="loading">
+        {{ loading ? 'Creating...' : 'Create account' }}
+      </button>
+    </form>
+
+    <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
+
+    <div class="footer">
+      <span>Already have an account?</span>
+      <a routerLink="/signin">Sign in</a>
+    </div>
+  </div>
+</section>

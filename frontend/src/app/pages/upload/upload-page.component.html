@@ -1,7 +1,7 @@
 <section class="card">
   <h1>Soumettre une nouvelle offre</h1>
   <p class="subtitle">
-    Téléverse un PDF ou une image, ou colle simplement l'URL d'une offre.
+    Televersez un PDF ou une image, ou collez simplement l URL d une offre.
   </p>
 
   <form (ngSubmit)="submit()" [formGroup]="form">
@@ -11,16 +11,16 @@
     </div>
 
     <div class="field">
-      <label for="image">Capture d'écran</label>
+      <label for="image">Capture d ecran</label>
       <input id="image" type="file" accept="image/*" (change)="onFileChange($event, 'image')" />
     </div>
 
     <div class="field">
-      <label for="url">URL de l'offre</label>
+      <label for="url">URL de l offre</label>
       <input id="url" type="url" placeholder="https://..." formControlName="url" />
     </div>
 
-    <button type="submit" [disabled]="isSubmitting">Lancer l'extraction</button>
+    <button type="submit" [disabled]="isSubmitting">Lancer l extraction</button>
   </form>
 
   <p class="status" *ngIf="statusMessage">{{ statusMessage }}</p>
