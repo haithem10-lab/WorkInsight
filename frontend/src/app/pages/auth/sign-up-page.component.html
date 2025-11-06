@@ -1,51 +1,51 @@
 <section class="auth-shell">
   <div class="card">
-    <span class="badge">Free 14-day trial</span>
+    <span class="badge">{{ text.badge }}</span>
     <div class="header">
-      <h1>Create your account</h1>
-      <p>Start automating your recruitment data flows in minutes. No credit card required.</p>
+      <h1>{{ text.title }}</h1>
+      <p>{{ text.subtitle }}</p>
     </div>
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <label class="field">
-        <span>Full name</span>
-        <input type="text" placeholder="Taylor Reed" formControlName="fullName" />
+        <span>{{ text.fields.fullNameLabel }}</span>
+        <input type="text" [placeholder]="text.fields.fullNamePlaceholder" formControlName="fullName" />
         <small *ngIf="form.controls.fullName.invalid && form.controls.fullName.touched">
-          Please enter your name.
+          {{ text.fields.fullNameError }}
         </small>
       </label>
 
       <label class="field">
-        <span>Email</span>
-        <input type="email" placeholder="you@company.com" formControlName="email" />
+        <span>{{ text.fields.emailLabel }}</span>
+        <input type="email" [placeholder]="text.fields.emailPlaceholder" formControlName="email" />
         <small *ngIf="form.controls.email.invalid && form.controls.email.touched">
-          Enter a valid email address.
+          {{ text.fields.emailError }}
         </small>
       </label>
 
       <label class="field">
-        <span>Password</span>
-        <input type="password" placeholder="Minimum 6 characters" formControlName="password" />
+        <span>{{ text.fields.passwordLabel }}</span>
+        <input type="password" [placeholder]="text.fields.passwordPlaceholder" formControlName="password" />
         <small *ngIf="form.controls.password.invalid && form.controls.password.touched">
-          Password must contain at least 6 characters.
+          {{ text.fields.passwordError }}
         </small>
       </label>
 
       <label class="checkbox">
         <input type="checkbox" formControlName="agree" />
-        <span>I agree to the WorkInsight terms of service.</span>
+        <span>{{ text.agreeLabel }}</span>
       </label>
 
       <button type="submit" [disabled]="loading">
-        {{ loading ? 'Creating...' : 'Create account' }}
+        {{ loading ? text.ctaLoading : text.cta }}
       </button>
     </form>
 
     <p *ngIf="errorMessage" class="error">{{ errorMessage }}</p>
 
     <div class="footer">
-      <span>Already have an account?</span>
-      <a routerLink="/signin">Sign in</a>
+      <span>{{ text.footerPrompt }}</span>
+      <a routerLink="/signin">{{ text.footerLink }}</a>
     </div>
   </div>
 </section>

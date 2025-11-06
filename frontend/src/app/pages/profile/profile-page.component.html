@@ -5,17 +5,18 @@
       <div class="details">
         <h1>{{ user.fullName || user.email }}</h1>
         <p>{{ user.email }}</p>
-        <span class="plan-badge">Free trial</span>
+        <span class="plan-badge">{{ text.planBadge }}</span>
       </div>
       <div class="header-actions">
-        <button type="button" (click)="navigate('/upload')">Submit extraction</button>
-        <button type="button" class="secondary" (click)="navigate('/results')">View results</button>
+        <button type="button" (click)="navigate('/upload')">{{ text.actions.submit }}</button>
+        <button type="button" class="secondary" (click)="navigate('/results')">{{ text.actions.results }}</button>
+        <button type="button" class="ghost" (click)="navigate('/matches')">CV matches</button>
       </div>
     </div>
 
     <div class="profile-body">
       <div class="status-row" *ngIf="loading">
-        <span class="muted">Fetching your activity...</span>
+        <span class="muted">{{ text.status.loading }}</span>
       </div>
       <div class="status-row error" *ngIf="!loading && errorMessage">
         {{ errorMessage }}
@@ -23,32 +24,32 @@
 
       <section class="summary-grid" *ngIf="stats">
         <article class="summary-card">
-          <span class="label">Total extractions</span>
+          <span class="label">{{ text.summary.total.label }}</span>
           <strong>{{ stats.totalOffers }}</strong>
-          <small>All time</small>
+          <small>{{ text.summary.total.hint }}</small>
         </article>
         <article class="summary-card">
-          <span class="label">This week</span>
+          <span class="label">{{ text.summary.week.label }}</span>
           <strong>{{ stats.offersThisWeek }}</strong>
-          <small>Past 7 days</small>
+          <small>{{ text.summary.week.hint }}</small>
         </article>
         <article class="summary-card">
-          <span class="label">Average confidence</span>
+          <span class="label">{{ text.summary.confidence.label }}</span>
           <strong>{{ averageConfidence }}</strong>
-          <small>Across recent jobs</small>
+          <small>{{ text.summary.confidence.hint }}</small>
         </article>
         <article class="summary-card">
-          <span class="label">Last extraction</span>
+          <span class="label">{{ text.summary.last.label }}</span>
           <strong>{{ lastExtractionLabel }}</strong>
-          <small>Keep new submissions coming</small>
+          <small>{{ text.summary.last.hint }}</small>
         </article>
       </section>
 
       <section class="panels">
         <div class="panel" *ngIf="stats; else emptyStats">
           <header>
-            <h2>Source breakdown</h2>
-            <p>Where your jobs originate</p>
+            <h2>{{ text.sources.title }}</h2>
+            <p>{{ text.sources.subtitle }}</p>
           </header>
           <ul class="source-list" *ngIf="sourceBreakdown.length; else noSources">
             <li *ngFor="let item of sourceBreakdown">
@@ -57,44 +58,99 @@
             </li>
           </ul>
           <ng-template #noSources>
-            <p class="muted">No submissions recorded yet.</p>
+            <p class="muted">{{ text.sources.empty }}</p>
           </ng-template>
         </div>
 
-        <div class="panel">
+        <div class="panel resume-panel">
           <header>
-            <h2>Preferences</h2>
-            <p>Tune defaults for faster submissions</p>
+            <h2>{{ text.resume.title }}</h2>
+            <p>{{ text.resume.subtitle }}</p>
           </header>
-          <div class="toggle-list">
-            <label>
-              <input type="checkbox" [checked]="settings.preferPdf" (change)="toggleSetting('preferPdf')" />
-              Auto-select PDF uploads
-            </label>
-            <label>
-              <input type="checkbox" [checked]="settings.preferImage" (change)="toggleSetting('preferImage')" />
-              Enable screenshot imports
-            </label>
-            <label>
-              <input type="checkbox" [checked]="settings.preferUrl" (change)="toggleSetting('preferUrl')" />
-              Enable URL capture by default
-            </label>
+          <div class="resume-callout">
+            <div class="resume-icon-badge">
+              <svg width="32" height="38" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                  d="M21 2H9C6.79086 2 5 3.79086 5 6V32C5 34.2091 6.79086 36 9 36H23C25.2091 36 27 34.2091 27 32V12L21 2Z"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M21 2V12H27"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M11 23H21"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+                <path
+                  d="M11 28H21"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+            <div class="resume-content">
+              <p class="resume-lede">{{ text.resume.noResume }}</p>
+              <div class="resume-actions">
+                <input
+                  #resumeInput
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt"
+                  (change)="onResumeSelected($event)"
+                  hidden
+                />
+                <button type="button" class="resume-upload-button" (click)="resumeInput.click()" [disabled]="resumeUploading">
+                  <span class="button-icon">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M9 3V12M9 12L12.5 8.5M9 12L5.5 8.5"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M4 14.5H14"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </span>
+                  <span>{{ resumeUploading ? text.resume.uploading : text.resume.upload }}</span>
+                </button>
+              </div>
+              <p class="resume-note">{{ resumeUploadNote }}</p>
+              <div class="resume-status" *ngIf="resumeProfile?.updatedAt">
+                <span class="status-dot"></span>
+                {{ text.resume.lastUpdated }}
+                {{ resumeProfile?.updatedAt | date: 'medium':'':dateLocale }}
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="panel">
           <header>
-            <h2>Notifications</h2>
-            <p>Stay informed about results</p>
+            <h2>{{ text.notifications.title }}</h2>
+            <p>{{ text.notifications.subtitle }}</p>
           </header>
           <div class="toggle-list">
             <label>
               <input type="checkbox" [checked]="settings.alertLowConfidence" (change)="toggleSetting('alertLowConfidence')" />
-              Alert me when confidence &lt; 60%
+              {{ text.notifications.toggles.alertLowConfidence }}
             </label>
             <label>
               <input type="checkbox" [checked]="settings.weeklyDigest" (change)="toggleSetting('weeklyDigest')" />
-              Send a weekly extraction digest
+              {{ text.notifications.toggles.weeklyDigest }}
             </label>
           </div>
         </div>
@@ -102,51 +158,51 @@
 
       <ng-template #emptyStats>
         <div class="panel muted-panel">
-          <h2>No activity yet</h2>
-          <p class="muted">Run your first extraction to see metrics here.</p>
+          <h2>{{ text.emptyStats.title }}</h2>
+          <p class="muted">{{ text.emptyStats.description }}</p>
         </div>
       </ng-template>
 
       <section class="recent-panel">
         <header>
-          <h2>Recent extractions</h2>
-          <button type="button" class="link" (click)="navigate('/results')">View all</button>
+          <h2>{{ text.recent.title }}</h2>
+          <button type="button" class="link" (click)="navigate('/results')">{{ text.recent.viewAll }}</button>
         </header>
         <ul class="recent-list" *ngIf="recentOffers.length; else noRecent">
           <li *ngFor="let offer of recentOffers">
             <div>
-              <strong>{{ offer.title || 'Untitled offer' }}</strong>
+              <strong>{{ offer.title || text.recent.untitled }}</strong>
               <span class="meta">
-                {{ offer.sourceType || 'Manual' }} -
-                {{ offer.createdAt ? (offer.createdAt | date: 'medium') : 'Pending' }}
+                {{ offer.sourceType || text.recent.fallbackSource }} -
+                {{ offer.createdAt ? (offer.createdAt | date: 'medium':'':dateLocale) : text.recent.pending }}
               </span>
             </div>
             <span class="confidence" [class.low]="(offer.confidenceScore ?? 0) < 0.6">
-              {{ offer.confidenceScore ? (offer.confidenceScore * 100 | number: '1.0-0') + '%' : 'n/a' }}
+              {{ offer.confidenceScore ? (offer.confidenceScore * 100 | number: '1.0-0') + '%' : text.recent.noConfidence }}
             </span>
           </li>
         </ul>
         <ng-template #noRecent>
-          <p class="muted">Your latest extractions will appear here once you run them.</p>
+          <p class="muted">{{ text.recent.empty }}</p>
         </ng-template>
       </section>
     </div>
 
     <div class="profile-footer">
-      <button type="button" class="logout" (click)="signOut()">Logout</button>
+      <button type="button" class="logout" (click)="signOut()">{{ text.actions.logout }}</button>
     </div>
   </div>
 
   <ng-template #guestView>
     <div class="profile-card empty">
-      <h2>You are not signed in</h2>
-      <p>
-        Create an account or sign in to access your saved extractions and update your profile.
-      </p>
+      <h2>{{ text.guest.title }}</h2>
+      <p>{{ text.guest.description }}</p>
       <div class="profile-actions">
-        <button type="button" (click)="navigate('/signup')">Create account</button>
-        <button type="button" class="secondary" (click)="navigate('/signin')">Sign in</button>
+        <button type="button" (click)="navigate('/signup')">{{ text.guest.signup }}</button>
+        <button type="button" class="secondary" (click)="navigate('/signin')">{{ text.guest.signin }}</button>
       </div>
     </div>
   </ng-template>
 </section>
+
+

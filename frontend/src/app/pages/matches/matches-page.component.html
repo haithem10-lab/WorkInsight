@@ -1,0 +1,60 @@
+<section class="matches-shell">
+  <header class="matches-header">
+    <div>
+      <h1>Resume matching</h1>
+      <p class="muted">
+        We compare the skills in your resume with the jobs you have extracted. Refresh your resume to update these matches.
+      </p>
+    </div>
+    <a routerLink="/profile" class="ghost-button">Back to profile</a>
+  </header>
+
+  <div *ngIf="loading" class="loading-state">
+    <span class="spinner" aria-hidden="true"></span>
+    <p>Collecting your personalised recommendations...</p>
+  </div>
+
+  <ng-container *ngIf="!loading">
+    <section class="resume-card">
+      <h2>{{ headline }}</h2>
+      <p class="muted" *ngIf="summary">{{ summary }}</p>
+      <p class="muted" *ngIf="!hasResume">
+        Upload your resume from the profile page to unlock tailored job suggestions.
+      </p>
+    </section>
+
+    <section class="recommendations-card">
+      <header>
+        <h2>Matched jobs</h2>
+        <p class="muted" *ngIf="hasResume && !recommendations.length">
+          No strong matches yet. We will refresh this list as soon as new jobs are extracted.
+        </p>
+      </header>
+
+      <ul class="recommendation-grid" *ngIf="recommendations.length">
+        <li *ngFor="let rec of recommendations">
+          <div class="rec-header">
+            <div>
+              <strong>{{ rec.title || 'Untitled offer' }}</strong>
+              <span class="muted">{{ rec.company || 'Unknown company' }}</span>
+            </div>
+            <span class="match-score">{{ (rec.matchScore * 100) | number: '1.0-0' }}%</span>
+          </div>
+          <div class="rec-meta">
+            <span *ngIf="rec.location">{{ rec.location }}</span>
+            <span *ngIf="rec.sourceType">{{ rec.sourceType }}</span>
+            <span *ngIf="rec.confidenceScore !== null && rec.confidenceScore !== undefined">
+              Confidence {{ (rec.confidenceScore * 100) | number: '1.0-0' }}%
+            </span>
+          </div>
+          <p class="muted small" *ngIf="rec.summary">{{ rec.summary }}</p>
+          <div class="chip-row" *ngIf="rec.matchedSkills?.length">
+            <span class="chip-label">Matching skills</span>
+            <span class="chip" *ngFor="let skill of rec.matchedSkills">{{ skill }}</span>
+          </div>
+          <a routerLink="/results" class="link-button">View in results</a>
+        </li>
+      </ul>
+    </section>
+  </ng-container>
+</section>

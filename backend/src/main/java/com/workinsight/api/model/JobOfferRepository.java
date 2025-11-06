@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
   List<JobOffer> findByUserIdOrderByCreatedAtDesc(String userId);
 
+  List<JobOffer> findTop5ByUserIdOrderByCreatedAtDesc(String userId);
+
   Optional<JobOffer> findByIdAndUserId(String id, String userId);
 }
 

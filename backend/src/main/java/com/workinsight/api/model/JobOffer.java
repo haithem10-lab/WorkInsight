@@ -21,7 +21,13 @@ public class JobOffer {
   private Double confidenceScore;
   private Long processingTimeMs;
   private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
   private String userId;
+  private List<String> tags;
+  private String notes;
+  private String rawTextSnapshot;
+  private Double latitude;
+  private Double longitude;
 
   public JobOffer() {
   }
@@ -38,7 +44,13 @@ public class JobOffer {
       Double confidenceScore,
       Long processingTimeMs,
       LocalDateTime createdAt,
-      String userId
+      LocalDateTime updatedAt,
+      List<String> tags,
+      String notes,
+      String rawTextSnapshot,
+      String userId,
+      Double latitude,
+      Double longitude
   ) {
     this.title = title;
     this.company = company;
@@ -51,7 +63,13 @@ public class JobOffer {
     this.confidenceScore = confidenceScore;
     this.processingTimeMs = processingTimeMs;
     this.createdAt = createdAt;
+    this.updatedAt = updatedAt;
+    this.tags = tags;
+    this.notes = notes;
+    this.rawTextSnapshot = rawTextSnapshot;
     this.userId = userId;
+    this.latitude = latitude;
+    this.longitude = longitude;
   }
 
   public String getId() {
@@ -150,11 +168,59 @@ public class JobOffer {
     this.createdAt = createdAt;
   }
 
+  public LocalDateTime getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(LocalDateTime updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
   public String getUserId() {
     return userId;
   }
 
   public void setUserId(String userId) {
     this.userId = userId;
+  }
+
+  public List<String> getTags() {
+    return tags;
+  }
+
+  public void setTags(List<String> tags) {
+    this.tags = tags;
+  }
+
+  public String getNotes() {
+    return notes;
+  }
+
+  public void setNotes(String notes) {
+    this.notes = notes;
+  }
+
+  public String getRawTextSnapshot() {
+    return rawTextSnapshot;
+  }
+
+  public void setRawTextSnapshot(String rawTextSnapshot) {
+    this.rawTextSnapshot = rawTextSnapshot;
+  }
+
+  public Double getLatitude() {
+    return latitude;
+  }
+
+  public void setLatitude(Double latitude) {
+    this.latitude = latitude;
+  }
+
+  public Double getLongitude() {
+    return longitude;
+  }
+
+  public void setLongitude(Double longitude) {
+    this.longitude = longitude;
   }
 }

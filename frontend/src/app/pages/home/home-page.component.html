@@ -1,20 +1,17 @@
 <section class="hero" id="home">
   <div class="hero-copy">
     <h1>
-      Bring every job offer into
-      <span class="highlight">one intelligent workspace</span>
+      {{ text.hero.title }}
+      <span class="highlight">{{ text.hero.highlight }}</span>
     </h1>
-    <p class="lead">
-      WorkInsight ingests PDFs, screenshots, spreadsheets, and career site links, then turns them into structured data
-      ready for sourcing, outreach, and reporting across your hiring stack.
-    </p>
+    <p class="lead">{{ text.hero.lead }}</p>
     <div class="cta-row">
-      <button routerLink="/signup" class="primary">Start extracting</button>
-      <button routerLink="/signin" class="ghost">Connect my workspace</button>
+      <button type="button" class="primary" (click)="startExtracting()">{{ text.hero.primaryCta }}</button>
+      <button type="button" class="ghost" (click)="connectWorkspace()">{{ text.hero.secondaryCta }}</button>
     </div>
     <div class="support-row">
-      <button routerLink="/upload" class="text-link">See supported formats</button>
-      <span class="hint">or review the end-to-end workflow below</span>
+      <button routerLink="/upload" class="text-link">{{ text.hero.supportLink }}</button>
+      <span class="hint">{{ text.hero.supportHint }}</span>
     </div>
   </div>
   <div class="hero-visual">
@@ -22,19 +19,11 @@
     <div class="orb"></div>
     <div class="orb orb--secondary"></div>
     <div class="card">
-      <h3>Live extraction preview</h3>
+      <h3>{{ text.hero.card.title }}</h3>
       <ul>
-        <li>
-          <span class="label">Source</span>
-          <span class="value">Career page</span>
-        </li>
-        <li>
-          <span class="label">Matches</span>
-          <span class="value">182 profiles</span>
-        </li>
-        <li>
-          <span class="label">Confidence</span>
-          <span class="value good">0.91</span>
+        <li *ngFor="let metric of text.hero.card.metrics">
+          <span class="label">{{ metric.label }}</span>
+          <span class="value" [class.good]="metric.accent">{{ metric.value }}</span>
         </li>
       </ul>
       <div class="sparkline">
@@ -46,15 +35,13 @@
         <div class="bar" style="height: 82%"></div>
       </div>
     </div>
-    <div class="floating-tag">Unify job data</div>
+    <div class="floating-tag">{{ text.hero.floatingTag }}</div>
   </div>
 </section>
 
 <section class="features" id="features">
-  <h2>Why talent teams rely on WorkInsight</h2>
-  <p class="subtitle">
-    Purpose-built for operations, campus hiring, and agency teams that need reliable data from every job source.
-  </p>
+  <h2>{{ text.features.heading }}</h2>
+  <p class="subtitle">{{ text.features.subtitle }}</p>
   <div class="grid">
     <article *ngFor="let feature of featureColumns" class="feature-card">
       <h3>{{ feature.title }}</h3>
@@ -65,12 +52,9 @@
 
 <section class="use-cases" id="about">
   <div class="section-heading">
-    <span class="eyebrow">Practical examples</span>
-    <h2>Actionable insights across every hiring channel.</h2>
-    <p>
-      Upload job packs from email, drag in screenshots from the field, or sync with career portals. Push clean data to
-      Sheets, CRMs, or automation tools in minutes.
-    </p>
+    <span class="eyebrow">{{ text.useCases.eyebrow }}</span>
+    <h2>{{ text.useCases.title }}</h2>
+    <p>{{ text.useCases.description }}</p>
   </div>
   <div class="example-grid">
     <article *ngFor="let example of practicalExamples" class="example-card">
@@ -118,32 +102,29 @@
   <div class="workflow-media">
     <div class="workflow-screen">
       <div class="screen-header">
-        <span>Select a text to capture or press <strong>Esc</strong> to cancel</span>
+        <span>{{ workflowHeader }}</span>
       </div>
       <div class="screen-body">
         <div class="screen-list">
-          <div class="list-item" *ngFor="let row of [1,2,3,4]">
-            <div class="avatar">{{ row }}</div>
+          <div class="list-item" *ngFor="let step of automationSteps; let index = index">
+            <div class="avatar">{{ index + 1 }}</div>
             <div class="meta">
-              <div class="title">Visible Text HTML</div>
+              <div class="title">{{ step.label }}</div>
+              <p class="summary">{{ step.description }}</p>
               <div class="subtitle">
-                <span class="chip">Design Tools</span>
-                <span class="chip">Web Design</span>
+                <span class="chip" *ngFor="let hint of step.hints">{{ hint }}</span>
               </div>
             </div>
-            <span class="rating">4.8</span>
+            <span class="rating">{{ step.action }}</span>
           </div>
         </div>
       </div>
     </div>
   </div>
   <div class="workflow-copy">
-    <span class="eyebrow">Automation flow</span>
-    <h2>Turn messy job inputs into structured candidate signals.</h2>
-    <p>
-      Map your parsing logic once, add enrichment rules, and let WorkInsight validate requirements, benefits, skills, and
-      compensation before syncing it to downstream systems.
-    </p>
+    <span class="eyebrow">{{ text.workflow.eyebrow }}</span>
+    <h2>{{ text.workflow.title }}</h2>
+    <p>{{ text.workflow.description }}</p>
     <div class="workflow-steps">
       <article class="workflow-step" *ngFor="let step of automationSteps">
         <span class="step-label">{{ step.label }}</span>
@@ -153,16 +134,35 @@
   </div>
 </section>
 
+<section class="matching" id="matches">
+  <div class="section-heading">
+    <span class="eyebrow">{{ text.matching.eyebrow }}</span>
+    <h2>{{ text.matching.title }}</h2>
+    <p>{{ text.matching.subtitle }}</p>
+  </div>
+  <div class="matching-grid">
+    <article *ngFor="let point of text.matching.points" class="matching-card">
+      <h3>{{ point.title }}</h3>
+      <p>{{ point.description }}</p>
+    </article>
+  </div>
+  <div class="matching-cta-row">
+    <button type="button" (click)="viewMatches()">{{ text.matching.cta }}</button>
+  </div>
+</section>
+
 <section class="robots" id="templates">
   <div class="section-heading">
-    <span class="eyebrow">Import accelerators</span>
-    <h2>Extract job data in under 2 minutes.</h2>
-    <p>
-      Skip manual setup with templates that handle the most common formats your team receives every day.
-    </p>
+    <span class="eyebrow">{{ text.robots.eyebrow }}</span>
+    <h2>{{ text.robots.title }}</h2>
+    <p>{{ text.robots.description }}</p>
   </div>
   <div class="robot-grid">
-    <article *ngFor="let robot of robotTemplates" class="robot-card" [class.robot-card--primary]="robot.cta === 'View more'">
+    <article
+      *ngFor="let robot of robotTemplates"
+      class="robot-card"
+      [class.robot-card--primary]="robot.cta === text.robots.templates[text.robots.templates.length - 1].cta"
+    >
       <div class="robot-logo" [attr.data-name]="robot.name">
         <span>{{ robot.logo }}</span>
       </div>
@@ -179,10 +179,10 @@
   </div>
 </section>
 
-<section class="faq">
+<section class="faq" id="faq">
   <div class="section-heading">
-    <h2>Frequently asked questions</h2>
-    <p>Everything you need to know about how WorkInsight accelerates recruiting operations.</p>
+    <h2>{{ text.faq.heading }}</h2>
+    <p>{{ text.faq.subtitle }}</p>
   </div>
   <div class="faq-list">
     <article

@@ -1,26 +1,35 @@
 <section class="card">
-  <h1>Soumettre une nouvelle offre</h1>
+  <h1>{{ text.heading }}</h1>
   <p class="subtitle">
-    Televersez un PDF ou une image, ou collez simplement l URL d une offre.
+    {{ text.subtitle }}
   </p>
 
+  <div class="source-detection" *ngIf="detectedPipeline">
+    <span class="detection-pill">{{ detectedLabel }}</span>
+    <small>{{ text.detectionHint }}</small>
+  </div>
+
   <form (ngSubmit)="submit()" [formGroup]="form">
-    <div class="field">
-      <label for="pdf">Fichier PDF</label>
-      <input id="pdf" type="file" accept="application/pdf" (change)="onFileChange($event, 'pdf')" />
+    <div class="field" [class.detected]="!!detectedPipeline">
+      <label for="file">{{ text.labels.file }}</label>
+      <input
+        id="file"
+        type="file"
+        (change)="onFileChange($event)"
+        accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.doc,.docx,.rtf,.txt,.odt,.xls,.xlsx,.ods,.csv,.json,image/*,application/pdf,application/json,text/plain,text/csv,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.spreadsheet"
+      />
     </div>
 
     <div class="field">
-      <label for="image">Capture d ecran</label>
-      <input id="image" type="file" accept="image/*" (change)="onFileChange($event, 'image')" />
+      <label for="url">{{ text.labels.url }}</label>
+      <input id="url" type="url" [placeholder]="text.placeholders.url" formControlName="url" />
     </div>
 
-    <div class="field">
-      <label for="url">URL de l offre</label>
-      <input id="url" type="url" placeholder="https://..." formControlName="url" />
+    <div class="upload-actions">
+      <button type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? text.submitStates.submitting : text.submitStates.idle }}
+      </button>
     </div>
-
-    <button type="submit" [disabled]="isSubmitting">Lancer l extraction</button>
   </form>
 
   <p class="status" *ngIf="statusMessage">{{ statusMessage }}</p>

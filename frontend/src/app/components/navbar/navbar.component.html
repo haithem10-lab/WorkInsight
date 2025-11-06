@@ -21,7 +21,7 @@
             [routerLinkActiveOptions]="{ exact: true }"
             (click)="closeMobileMenus()"
           >
-            Home
+            {{ text.home }}
           </a>
         </li>
         <li class="nav-item">
@@ -31,7 +31,7 @@
             routerLinkActive="active"
             (click)="closeMobileMenus()"
           >
-            About
+            {{ text.about }}
           </a>
         </li>
         <li class="nav-item">
@@ -41,7 +41,7 @@
             routerLinkActive="active"
             (click)="closeMobileMenus()"
           >
-            Features
+            {{ text.features }}
           </a>
         </li>
         <li class="nav-item">
@@ -51,7 +51,7 @@
             routerLinkActive="active"
             (click)="closeMobileMenus()"
           >
-            Workflow
+            {{ text.workflow }}
           </a>
         </li>
         <li class="nav-item">
@@ -61,7 +61,17 @@
             routerLinkActive="active"
             (click)="closeMobileMenus()"
           >
-            Templates
+            {{ text.templates }}
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            routerLink="/"
+            fragment="faq"
+            routerLinkActive="active"
+            (click)="closeMobileMenus()"
+          >
+            {{ text.faq }}
           </a>
         </li>
 
@@ -69,18 +79,94 @@
 
       <ng-container *ngIf="currentUser$ | async as user; else mobileGuestActions">
         <div class="mobile-user-actions">
-          <button type="button" (click)="navigateTo('/profile')">Profile</button>
-          <button type="button" (click)="navigateTo('/results')">Results</button>
-          <button type="button" class="logout" (click)="logout()">Logout</button>
+          <button type="button" (click)="navigateTo('/profile')">{{ text.profile }}</button>
+          <button type="button" (click)="navigateTo('/results')">{{ text.results }}</button>
+          <button type="button" class="logout" (click)="logout()">{{ text.logout }}</button>
         </div>
       </ng-container>
       <ng-template #mobileGuestActions>
         <div class="mobile-actions">
-          <a routerLink="/signin" class="login" (click)="closeMobileMenus()">Login</a>
-          <a routerLink="/signup" class="cta" (click)="closeMobileMenus()">Start for free</a>
+          <a routerLink="/signin" class="login" (click)="closeMobileMenus()">{{ text.login }}</a>
+          <a routerLink="/signup" class="cta" (click)="closeMobileMenus()">{{ text.startFree }}</a>
         </div>
       </ng-template>
+      <div class="mobile-language" (click)="$event.stopPropagation()">
+        <button
+          type="button"
+          class="language-toggle"
+          (click)="toggleLanguageMenu($event)"
+          aria-haspopup="listbox"
+          [attr.aria-expanded]="languageMenuOpen"
+        >
+          <span class="language-code">{{ selectedLanguage }}</span>
+          <span class="chevron chevron--small" [class.open]="languageMenuOpen">
+            <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+              <path d="M5.75 7.5L10 11.75L14.25 7.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+        </button>
+        <div class="language-dropdown" *ngIf="languageMenuOpen" (click)="$event.stopPropagation()">
+          <button
+            type="button"
+            *ngFor="let option of languages"
+            [class.active]="option === selectedLanguage"
+            (click)="setLanguage(option)"
+            role="option"
+            [attr.aria-selected]="option === selectedLanguage"
+          >
+            <span class="option-label">{{ text.languageNames[option] }}</span>
+            <span class="option-short">{{ option }}</span>
+          </button>
+        </div>
+      </div>
+      <button type="button" class="theme-toggle mobile-only" (click)="toggleTheme()" [attr.aria-label]="themeToggleLabel">
+        <span class="theme-icon" [class.active]="currentTheme === 'light'">&#9728;</span>
+        <span class="theme-icon" [class.active]="currentTheme === 'dark'">&#9790;</span>
+      </button>
     </nav>
+
+    <div class="controls-row">
+      <div class="theme-switcher">
+        <button
+          type="button"
+          class="theme-toggle"
+          (click)="toggleTheme()"
+          [attr.aria-label]="themeToggleLabel"
+        >
+          <span class="theme-icon" [class.active]="currentTheme === 'light'">&#9728;</span>
+          <span class="theme-icon" [class.active]="currentTheme === 'dark'">&#9790;</span>
+        </button>
+      </div>
+      <div class="language-switcher" (click)="$event.stopPropagation()">
+        <button
+          type="button"
+          class="language-toggle"
+          (click)="toggleLanguageMenu($event)"
+          aria-haspopup="listbox"
+        [attr.aria-expanded]="languageMenuOpen"
+      >
+        <span class="language-code">{{ selectedLanguage }}</span>
+        <span class="chevron chevron--small" [class.open]="languageMenuOpen">
+          <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+            <path d="M5.75 7.5L10 11.75L14.25 7.5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </span>
+      </button>
+      <div class="language-dropdown" *ngIf="languageMenuOpen" (click)="$event.stopPropagation()">
+        <button
+          type="button"
+          *ngFor="let option of languages"
+          [class.active]="option === selectedLanguage"
+          (click)="setLanguage(option)"
+          role="option"
+          [attr.aria-selected]="option === selectedLanguage"
+        >
+          <span class="option-label">{{ text.languageNames[option] }}</span>
+          <span class="option-short">{{ option }}</span>
+        </button>
+      </div>
+    </div>
+    </div>
 
     <ng-container *ngIf="currentUser$ | async as user; else desktopGuestActions">
       <div class="actions logged-in">
@@ -94,17 +180,17 @@
           </span>
         </button>
         <div class="user-dropdown" *ngIf="userMenuOpen" (click)="$event.stopPropagation()">
-          <button type="button" (click)="navigateTo('/profile')">Profile</button>
-          <button type="button" (click)="navigateTo('/results')">Results</button>
+          <button type="button" (click)="navigateTo('/profile')">{{ text.profile }}</button>
+          <button type="button" (click)="navigateTo('/results')">{{ text.results }}</button>
           <hr />
-          <button type="button" class="logout" (click)="logout()">Logout</button>
+          <button type="button" class="logout" (click)="logout()">{{ text.logout }}</button>
         </div>
       </div>
     </ng-container>
     <ng-template #desktopGuestActions>
       <div class="actions">
-        <a routerLink="/signin" class="login">Login</a>
-        <a routerLink="/signup" class="cta">Start for free</a>
+        <a routerLink="/signin" class="login">{{ text.login }}</a>
+        <a routerLink="/signup" class="cta">{{ text.startFree }}</a>
       </div>
     </ng-template>
   </div>

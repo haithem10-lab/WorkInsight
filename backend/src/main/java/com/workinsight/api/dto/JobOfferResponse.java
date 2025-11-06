@@ -15,7 +15,13 @@ public record JobOfferResponse(
     Double confidenceScore,
     String status,
     LocalDateTime createdAt,
+    LocalDateTime updatedAt,
     Long processingTimeMs,
-    String userId
+    List<String> tags,
+    String notes,
+    String rawTextSnapshot,
+    String userId,
+    Double latitude,
+    Double longitude
 ) {
 }

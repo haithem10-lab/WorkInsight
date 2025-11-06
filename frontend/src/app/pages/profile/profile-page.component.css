@@ -119,11 +119,120 @@
   color: #fecaca;
 }
 
+:host-context([data-theme='light']) .profile-card {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(148, 163, 184, 0.28);
+  color: #0f172a;
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.12);
+}
+
+:host-context([data-theme='light']) .plan-badge {
+  background: rgba(59, 130, 246, 0.18);
+  color: #1d4ed8;
+}
+
+:host-context([data-theme='light']) .header-actions button {
+  background: rgba(226, 232, 240, 0.68);
+  border-color: rgba(148, 163, 184, 0.32);
+  color: #1f2937;
+}
+
+:host-context([data-theme='light']) .header-actions button:hover {
+  border-color: rgba(59, 130, 246, 0.35);
+  background: rgba(191, 219, 254, 0.8);
+}
+
+:host-context([data-theme='light']) .summary-card {
+  background: rgba(248, 250, 255, 0.85);
+  border-color: rgba(148, 163, 184, 0.28);
+  color: #0f172a;
+}
+
+:host-context([data-theme='light']) .summary-card .label {
+  color: #55627a;
+}
+
+:host-context([data-theme='light']) .summary-card strong {
+  color: #1b2533;
+}
+
+:host-context([data-theme='light']) .summary-card small {
+  color: #64748b;
+}
+
+:host-context([data-theme='light']) .panel {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(148, 163, 184, 0.24);
+  color: #0f172a;
+  box-shadow: 0 20px 44px rgba(148, 163, 184, 0.18);
+}
+
+:host-context([data-theme='light']) .panel header h2 {
+  color: #1f2937;
+}
+
+:host-context([data-theme='light']) .panel header p {
+  color: #475569;
+}
+
+:host-context([data-theme='light']) .source-list span:first-child {
+  color: #1f2937;
+}
+
+:host-context([data-theme='light']) .source-list span:last-child {
+  color: #2563eb;
+}
+
+:host-context([data-theme='light']) .resume-upload-button {
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+}
+
+:host-context([data-theme='light']) .resume-note,
+:host-context([data-theme='light']) .resume-status {
+  color: #475569;
+}
+
+:host-context([data-theme='light']) .toggle-list label {
+  color: #1f2937;
+}
+
+:host-context([data-theme='light']) .muted {
+  color: #64748b;
+}
+
+:host-context([data-theme='light']) .recent-panel {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(148, 163, 184, 0.24);
+  box-shadow: 0 20px 44px rgba(148, 163, 184, 0.18);
+}
+
+:host-context([data-theme='light']) .recent-list li {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+  color: #1f2937;
+}
+
+:host-context([data-theme='light']) .recent-list .meta {
+  color: #475569;
+}
+
+:host-context([data-theme='light']) .confidence {
+  color: #047857;
+}
+
+:host-context([data-theme='light']) .confidence.low {
+  color: #b91c1c;
+}
+
+:host-context([data-theme='light']) .logout {
+  border-color: rgba(248, 113, 113, 0.5);
+  color: #b91c1c;
+}
 @media (max-width: 540px) {
   .profile-card {
     padding: 2rem 1.6rem;
     align-items: center;
     text-align: center;
+    width: 100%;
   }
 
   .profile-header {
@@ -138,6 +247,19 @@
   .profile-footer {
     width: 100%;
     justify-content: center;
+  }
+}
+
+@media (max-width: 720px) {
+  .profile-shell {
+    min-height: auto;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 2.5rem 1rem 3rem;
+  }
+
+  .profile-card {
+    width: 100%;
   }
 }
 
@@ -372,5 +494,173 @@
 
 .status-row.error {
   color: #fda4af;
+}
+
+
+.resume-panel {
+  position: relative;
+}
+
+.resume-callout {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1.6rem;
+  padding: 1.4rem 1.6rem;
+  border-radius: 18px;
+  border: 1px solid rgba(99, 102, 241, 0.32);
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.85), rgba(15, 23, 42, 0.82));
+  overflow: hidden;
+}
+
+.resume-callout::after {
+  content: '';
+  position: absolute;
+  inset: -20% auto auto 55%;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.28), transparent 70%);
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+.resume-icon-badge {
+  position: relative;
+  z-index: 1;
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(79, 70, 229, 0.95), rgba(14, 165, 233, 0.85));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #e0f2fe;
+  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.25);
+}
+
+.resume-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.resume-lede {
+  margin: 0;
+  color: #e2e8f0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.resume-actions {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+
+.resume-upload-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.6rem;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #6366f1, #0ea5e9);
+  color: #ffffff;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 18px 36px rgba(59, 130, 246, 0.27);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.resume-upload-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 22px 42px rgba(59, 130, 246, 0.34);
+  filter: brightness(1.05);
+}
+
+.resume-upload-button:disabled {
+  cursor: progress;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.18);
+}
+
+.resume-upload-button .button-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.12);
+  color: #ffffff;
+}
+
+.resume-upload-button svg {
+  display: block;
+}
+
+.resume-note {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 0.82rem;
+}
+
+.resume-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #cbd5f5;
+  font-size: 0.82rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.12);
+}
+
+@media (max-width: 720px) {
+  .resume-callout {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .resume-icon-badge {
+    width: 64px;
+    height: 64px;
+  }
+
+  .resume-actions {
+    width: 100%;
+  }
+
+  .resume-upload-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+
+.header-actions button.ghost {
+  background: transparent;
+  border-color: rgba(148, 163, 184, 0.35);
+  color: #60a5fa;
+}
+.header-actions button.ghost:hover {
+  background: rgba(59, 130, 246, 0.18);
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+
+.link-button.small-link {
+  font-size: 0.85rem;
+  align-self: flex-start;
 }
 

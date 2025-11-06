@@ -1,44 +1,49 @@
 <section class="dashboard">
   <div class="header">
     <div>
-      <h1>Tableau de bord</h1>
-      <p class="subtitle">Suivi des extractions en temps reel. Derniere mise a jour {{ lastRefreshLabel }}.</p>
+      <h1>{{ text.dashboardTitle }}</h1>
+      <p class="subtitle">{{ text.subtitlePrefix }} {{ lastRefreshLabel }}{{ text.subtitleSuffix }}</p>
     </div>
-    <button type="button" (click)="refresh()" [disabled]="isLoading">
-      {{ isLoading ? 'Chargement...' : 'Actualiser' }}
-    </button>
+    <div class="header-actions">
+      <button type="button" class="secondary-action" (click)="goToExtraction()">
+        {{ text.startExtraction }}
+      </button>
+      <button type="button" (click)="refresh()" [disabled]="isLoading">
+        {{ isLoading ? text.refreshLoading : text.refresh }}
+      </button>
+    </div>
   </div>
 
   <p *ngIf="!isLoading && errorMessage" class="error">{{ errorMessage }}</p>
 
   <div class="metrics-grid" *ngIf="stats">
     <article class="metric-card">
-      <span class="metric-label">Total offres</span>
+      <span class="metric-label">{{ text.metricsTotal }}</span>
       <strong class="metric-value">{{ stats.totalOffers }}</strong>
-      <span class="metric-hint">Depuis le lancement</span>
+      <span class="metric-hint">{{ text.metricsTotalHint }}</span>
     </article>
     <article class="metric-card">
-      <span class="metric-label">Aujourd hui</span>
+      <span class="metric-label">{{ text.metricsToday }}</span>
       <strong class="metric-value">{{ stats.offersToday }}</strong>
-      <span class="metric-hint">Nouvelles extractions</span>
+      <span class="metric-hint">{{ text.metricsTodayHint }}</span>
     </article>
     <article class="metric-card">
-      <span class="metric-label">7 derniers jours</span>
+      <span class="metric-label">{{ text.metricsWeek }}</span>
       <strong class="metric-value">{{ stats.offersThisWeek }}</strong>
-      <span class="metric-hint">Activite hebdomadaire</span>
+      <span class="metric-hint">{{ text.metricsWeekHint }}</span>
     </article>
     <article class="metric-card">
-      <span class="metric-label">Confiance moyenne</span>
+      <span class="metric-label">{{ text.metricsConfidence }}</span>
       <strong class="metric-value">{{ stats.averageConfidence | number: '1.0-2' }}</strong>
-      <span class="metric-hint">Score 0 a 1</span>
+      <span class="metric-hint">{{ text.metricsConfidenceHint }}</span>
     </article>
   </div>
 
   <div class="panel-grid" *ngIf="stats">
     <section class="panel">
       <header>
-        <h2>Activite des 7 derniers jours</h2>
-        <span class="panel-hint">Nombre d offres finalisees par jour</span>
+        <h2>{{ text.trendTitle }}</h2>
+        <span class="panel-hint">{{ text.trendHint }}</span>
       </header>
       <ul class="trend-list">
         <li *ngFor="let item of dailyTrend">
@@ -53,8 +58,8 @@
 
     <section class="panel">
       <header>
-        <h2>Repartition des sources</h2>
-        <span class="panel-hint">Origine des soumissions</span>
+        <h2>{{ text.sourcesTitle }}</h2>
+        <span class="panel-hint">{{ text.sourcesHint }}</span>
       </header>
       <ul class="breakdown-list">
         <li *ngFor="let entry of sourceBreakdown">
@@ -62,14 +67,14 @@
           <span class="value">{{ entry.value }}</span>
           <span class="percentage">{{ entry.percentage }}%</span>
         </li>
-        <li *ngIf="!sourceBreakdown.length" class="empty">Aucune donnee pour le moment.</li>
+        <li *ngIf="!sourceBreakdown.length" class="empty">{{ text.sourcesEmpty }}</li>
       </ul>
     </section>
 
     <section class="panel">
       <header>
-        <h2>Top entreprises</h2>
-        <span class="panel-hint">Classement par offres capturees</span>
+        <h2>{{ text.companiesTitle }}</h2>
+        <span class="panel-hint">{{ text.companiesHint }}</span>
       </header>
       <ul class="breakdown-list">
         <li *ngFor="let entry of topCompanies">
@@ -77,112 +82,352 @@
           <span class="value">{{ entry.value }}</span>
           <span class="percentage">{{ entry.percentage }}%</span>
         </li>
-        <li *ngIf="!topCompanies.length" class="empty">Pas encore de classement.</li>
+        <li *ngIf="!topCompanies.length" class="empty">{{ text.companiesEmpty }}</li>
       </ul>
     </section>
 
     <section class="panel">
       <header>
-        <h2>Competences frequentes</h2>
-        <span class="panel-hint">Mots clefs les plus detectes</span>
+        <h2>{{ text.skillsTitle }}</h2>
+        <span class="panel-hint">{{ text.skillsHint }}</span>
       </header>
       <ul class="chips">
         <li *ngFor="let entry of topSkills">
           <span class="chip">{{ entry.label }} <small>{{ entry.value }}</small></span>
         </li>
-        <li *ngIf="!topSkills.length" class="empty">En attente de donnees.</li>
+        <li *ngIf="!topSkills.length" class="empty">{{ text.skillsEmpty }}</li>
       </ul>
     </section>
   </div>
 
+  <section class="card map-card">
+    <div class="card-header">
+      <h2>{{ text.mapTitle }}</h2>
+      <span class="panel-hint">{{ text.mapHint }}</span>
+    </div>
+    <div class="map-wrapper">
+      <div class="map-container" #mapContainer></div>
+      <div class="map-empty" *ngIf="!mapHasData">
+        {{ text.mapEmpty }}
+      </div>
+      <ul class="map-legend" *ngIf="mapHasData">
+        <li>
+          <span class="legend-dot recent"></span>
+          <span>{{ text.mapLegendRecent }}</span>
+        </li>
+        <li>
+          <span class="legend-dot week"></span>
+          <span>{{ text.mapLegendWeek }}</span>
+        </li>
+        <li>
+          <span class="legend-dot older"></span>
+          <span>{{ text.mapLegendOlder }}</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
   <section class="card">
     <div class="card-header">
-      <h2>Offres extraites</h2>
-      <span class="panel-hint">Detail des enregistrements recents</span>
+      <h2>{{ text.extractedTitle }}</h2>
+      <span class="panel-hint">{{ text.extractedSubtitle }}</span>
     </div>
 
     <div class="table-controls">
       <div class="search-box">
         <input
           type="search"
-          placeholder="Rechercher une offre, une entreprise ou une competence..."
+          [placeholder]="text.searchPlaceholder"
           [value]="searchTerm"
           (input)="onSearch($any($event.target).value)"
         />
       </div>
-      <span class="sort-hint">Cliquez sur les colonnes pour trier</span>
+      <div class="table-actions">
+        <span class="sort-hint">{{ text.sortHint }}</span>
+        <button
+          type="button"
+          class="export-button"
+          (click)="exportOffers()"
+          [disabled]="isExporting || isLoading || !offers.length"
+        >
+          {{ isExporting ? text.exportingLabel : text.exportLabel }}
+        </button>
+      </div>
     </div>
 
-    <p *ngIf="isLoading" class="info">Chargement des offres...</p>
-    <p *ngIf="!isLoading && !offers.length" class="info">Aucune offre disponible pour le moment.</p>
+    <p *ngIf="isLoading" class="info">{{ text.loadingLabel }}</p>
+    <p *ngIf="!isLoading && !offers.length" class="info">{{ text.noOffers }}</p>
     <p *ngIf="!isLoading && offers.length && !filteredOffers.length" class="info">
-      Aucune offre ne correspond a votre recherche.
+      {{ text.noMatches }}
     </p>
 
     <div *ngIf="filteredOffers.length" class="table-wrapper">
       <table>
+        <colgroup>
+          <col class="col-expand" />
+          <col class="col-role" />
+          <col class="col-company" />
+          <col class="col-source" />
+          <col class="col-location" />
+          <col class="col-email" />
+          <col class="col-skills" />
+          <col class="col-confidence" />
+          <col class="col-status" />
+          <col class="col-created" />
+          <col class="col-actions" />
+        </colgroup>
         <thead>
           <tr>
+            <th class="expand-heading"></th>
             <th (click)="toggleSort('title')" class="sortable" [class.active]="sortColumn === 'title'">
-              Poste
-              <span class="sort-indicator" *ngIf="sortColumn === 'title'">
-                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              <span class="th-content">
+                <span>{{ text.columnRole }}</span>
+                <span class="sort-indicator" *ngIf="sortColumn === 'title'">
+                  {{ sortDirection === 'asc' ? '?' : '?' }}
+                </span>
               </span>
             </th>
             <th (click)="toggleSort('company')" class="sortable" [class.active]="sortColumn === 'company'">
-              Entreprise
-              <span class="sort-indicator" *ngIf="sortColumn === 'company'">
-                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              <span class="th-content">
+                <span>{{ text.columnCompany }}</span>
+                <span class="sort-indicator" *ngIf="sortColumn === 'company'">
+                  {{ sortDirection === 'asc' ? '?' : '?' }}
+                </span>
               </span>
             </th>
-            <th>Source</th>
-            <th>Localisation</th>
-            <th>Email</th>
-            <th>Competences</th>
+            <th>{{ text.columnSource }}</th>
+            <th>{{ text.columnLocation }}</th>
+            <th>{{ text.columnEmail }}</th>
+            <th>{{ text.columnSkills }}</th>
             <th (click)="toggleSort('confidenceScore')" class="sortable" [class.active]="sortColumn === 'confidenceScore'">
-              Confiance
-              <span class="sort-indicator" *ngIf="sortColumn === 'confidenceScore'">
-                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+              <span class="th-content">
+                <span>{{ text.columnConfidence }}</span>
+                <span class="sort-indicator" *ngIf="sortColumn === 'confidenceScore'">
+                  {{ sortDirection === 'asc' ? '?' : '?' }}
+                </span>
               </span>
             </th>
-            <th>Statut</th>
-            <th (click)="toggleSort('createdAt')" class="sortable" [class.active]="sortColumn === 'createdAt'">
-              Cree le
-              <span class="sort-indicator" *ngIf="sortColumn === 'createdAt'">
-                {{ sortDirection === 'asc' ? '▲' : '▼' }}
+            <th class="header-center">{{ text.columnStatus }}</th>
+            <th (click)="toggleSort('createdAt')" class="sortable header-center" [class.active]="sortColumn === 'createdAt'">
+              <span class="th-content">
+                <span>{{ text.columnCreated }}</span>
+                <span class="sort-indicator" *ngIf="sortColumn === 'createdAt'">
+                  {{ sortDirection === 'asc' ? '?' : '?' }}
+                </span>
               </span>
             </th>
-            <th class="actions-heading">Actions</th>
+            <th class="actions-heading header-center">{{ text.columnActions }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let offer of filteredOffers; trackBy: trackById">
-            <td>{{ offer.title || 'N/A' }}</td>
-            <td>{{ offer.company || 'N/A' }}</td>
-            <td>{{ offer.sourceType || 'Inconnu' }}</td>
-            <td>{{ offer.location || 'N/A' }}</td>
-            <td>{{ offer.contactEmail || 'N/A' }}</td>
-            <td>
-              <span *ngFor="let skill of (offer.skills || []); let last = last">
-                {{ skill }}<span *ngIf="!last">, </span>
-              </span>
-            </td>
-            <td>{{ offer.confidenceScore | number: '1.0-2' }}</td>
-            <td>{{ offer.status || 'COMPLETED' }}</td>
-            <td>{{ offer.createdAt ? (offer.createdAt | date: 'shortDate') : 'N/A' }}</td>
-            <td class="actions-col">
-              <button
-                type="button"
-                class="delete-button"
-                (click)="deleteOffer(offer)"
-                [disabled]="deletingId === offer.id"
-              >
-                {{ deletingId === offer.id ? 'Suppression...' : 'Supprimer' }}
-              </button>
-            </td>
-          </tr>
+          <ng-container *ngFor="let offer of filteredOffers; trackBy: trackById">
+            <tr
+              class="data-row"
+              [class.expanded]="offer.id === expandedOfferId"
+              (click)="toggleDetail(offer)"
+            >
+              <td class="expand-cell">
+                <button
+                  type="button"
+                  class="expand-button"
+                  (click)="toggleDetail(offer); $event.stopPropagation()"
+                  [attr.aria-expanded]="offer.id === expandedOfferId"
+                >
+                  <span class="chevron" [class.open]="offer.id === expandedOfferId"></span>
+                </button>
+              </td>
+              <td class="cell-title">{{ offer.title || text.untitledOffer }}</td>
+              <td class="cell-company">{{ offer.company || text.notAvailable }}</td>
+              <td class="cell-source">{{ offer.sourceType || text.unknownSource }}</td>
+              <td class="cell-location">{{ offer.location || text.notAvailable }}</td>
+              <td class="cell-email">{{ offer.contactEmail || text.notAvailable }}</td>
+              <td class="skills-cell">
+                <ng-container *ngIf="offer.skills?.length; else noSkills">
+                  <span *ngFor="let skill of offer.skills; let last = last">
+                    {{ skill }}<span *ngIf="!last">, </span>
+                  </span>
+                </ng-container>
+                <ng-template #noSkills>
+                  <span class="skill-placeholder">{{ text.notAvailable }}</span>
+                </ng-template>
+              </td>
+              <td class="cell-confidence">{{ offer.confidenceScore | number: '1.0-2' }}</td>
+              <td class="cell-status">
+                <span class="status-pill" [ngClass]="'status-pill--' + getStatusBadge(offer.status)">
+                  {{ getStatusLabel(offer.status) }}
+                </span>
+              </td>
+              <td class="cell-created">{{ offer.createdAt ? (offer.createdAt | date: 'shortDate') : text.notAvailable }}</td>
+              <td class="actions-col">
+                <button
+                  type="button"
+                  class="delete-button"
+                  (click)="deleteOffer(offer); $event.stopPropagation()"
+                  [disabled]="deletingId === offer.id"
+                  [attr.aria-label]="deletingId === offer.id ? text.deletingLabel : text.deleteLabel"
+                >
+                  <ng-container *ngIf="deletingId === offer.id; else trashIcon">
+                    <span class="delete-spinner" aria-hidden="true"></span>
+                  </ng-container>
+                  <ng-template #trashIcon>
+                    <svg class="delete-icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M9 3a1 1 0 0 0-.94.66L7.38 5H5a1 1 0 1 0 0 2h.68l.9 11.29A2.5 2.5 0 0 0 9.07 20h5.86a2.5 2.5 0 0 0 2.49-1.71L18.32 7H19a1 1 0 1 0 0-2h-2.38l-.68-1.34A1 1 0 0 0 15 3Zm1.24 2h3.52l.34.66H9.9ZM9 9a1 1 0 0 1 2 0v7a1 1 0 0 1-2 0Zm4 0a1 1 0 0 1 2 0v7a1 1 0 0 1-2 0Z"
+                      />
+                    </svg>
+                  </ng-template>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="offer.id === expandedOfferId" class="detail-row">
+              <td [attr.colspan]="11">
+                <form
+                  *ngIf="detailForm"
+                  [formGroup]="detailForm"
+                  class="detail-form"
+                  (submit)="saveDetail(); $event.preventDefault();"
+                >
+                  <div class="detail-header">
+                    <div>
+                      <h3>{{ text.detail.title }}</h3>
+                      <p>{{ text.detail.subtitle }}</p>
+                    </div>
+                    <div class="detail-meta" *ngIf="activeOffer as current">
+                      <div class="meta-item">
+                        <span class="meta-label">{{ text.detail.fields.updatedAt }}</span>
+                        <span class="meta-value">{{ current.updatedAt ? (current.updatedAt | date: 'short') : text.notAvailable }}</span>
+                      </div>
+                      <div class="meta-item">
+                        <span class="meta-label">{{ text.detail.fields.confidence }}</span>
+                        <span class="meta-value">{{ current.confidenceScore | number: '1.0-2' }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="detail-grid">
+                    <label>
+                      <span>{{ text.detail.fields.title }}</span>
+                      <input type="text" formControlName="title" />
+                    </label>
+                    <label>
+                      <span>{{ text.detail.fields.company }}</span>
+                      <input type="text" formControlName="company" />
+                    </label>
+                    <label>
+                      <span>{{ text.detail.fields.location }}</span>
+                      <input type="text" formControlName="location" />
+                    </label>
+                    <label>
+                      <span>{{ text.detail.fields.email }}</span>
+                      <input type="email" formControlName="contactEmail" />
+                    </label>
+                    <label class="wide">
+                      <span>{{ text.detail.fields.skills }}</span>
+                      <textarea rows="2" formControlName="skills"></textarea>
+                    </label>
+                    <label>
+                      <span>{{ text.detail.fields.status }}</span>
+                      <input type="text" formControlName="status" />
+                    </label>
+                    <label class="wide notes-field">
+                      <span>{{ text.detail.fields.notes }}</span>
+                      <textarea rows="3" formControlName="notes"></textarea>
+                    </label>
+                  </div>
+                  <div class="tags-section">
+                    <div class="tags-header">
+                      <span class="tags-label">{{ text.detail.fields.tags }}</span>
+                      <span class="tags-count">{{ detailTags.length }}/{{ maxTags }}</span>
+                    </div>
+                    <div class="tag-list">
+                      <span class="tag-chip" *ngFor="let tag of detailTags; let i = index">
+                        {{ tag }}
+                        <button type="button" (click)="removeTag(i)" aria-label="Remove tag">×</button>
+                      </span>
+                      <input
+                        type="text"
+                        [placeholder]="text.detail.addTagPlaceholder"
+                        (keydown.enter)="addTag($any($event.target).value); $any($event.target).value=''; $event.preventDefault();"
+                      />
+                    </div>
+                    <div class="quick-tags">
+                      <span>{{ text.detail.quickTagsLabel }}</span>
+                      <button
+                        type="button"
+                        *ngFor="let tag of quickTags"
+                        (click)="toggleQuickTag(tag)"
+                        [class.active]="detailTags.includes(tag)"
+                      >
+                        {{ tag }}
+                      </button>
+                    </div>
+                  </div>
+                  <div class="detail-actions">
+                    <button
+                      type="button"
+                      class="ghost ai-button"
+                      (click)="onAskCopilot($event)"
+                      [disabled]="suggestionLoading"
+                    >
+                      {{ suggestionLoading ? text.ai.loading : text.ai.button }}
+                    </button>
+                    <div class="suggestion-meta" *ngIf="suggestion?.confidenceScore !== null && suggestion?.confidenceScore !== undefined">
+                      <span class="meta-label">{{ text.ai.confidenceLabel }}</span>
+                      <span class="meta-value">{{ suggestion?.confidenceScore | number: '1.0-2' }}</span>
+                    </div>
+                    <button type="submit" class="primary save-button" [disabled]="savingDetail">
+                      {{ savingDetail ? text.detail.saving : text.detail.save }}
+                    </button>
+                  </div>
+                  <div class="suggestion-panel" *ngIf="suggestion">
+                    <header>
+                      <h4>{{ text.ai.heading }}</h4>
+                      <span class="updated-fields" *ngIf="suggestion.updatedFields?.length">
+                        {{ suggestion.updatedFields.join(', ') }}
+                      </span>
+                    </header>
+                    <div class="suggestion-content">
+                      <ul>
+                        <li>
+                          <strong>{{ text.detail.fields.title }}:</strong>
+                          <span>{{ suggestion.title || text.notAvailable }}</span>
+                        </li>
+                        <li>
+                          <strong>{{ text.detail.fields.company }}:</strong>
+                          <span>{{ suggestion.company || text.notAvailable }}</span>
+                        </li>
+                        <li>
+                          <strong>{{ text.detail.fields.location }}:</strong>
+                          <span>{{ suggestion.location || text.notAvailable }}</span>
+                        </li>
+                        <li>
+                          <strong>{{ text.detail.fields.email }}:</strong>
+                          <span>{{ suggestion.contactEmail || text.notAvailable }}</span>
+                        </li>
+                        <li>
+                          <strong>{{ text.detail.fields.skills }}:</strong>
+                          <span>{{ suggestion.skills?.length ? suggestion.skills.join(', ') : text.notAvailable }}</span>
+                        </li>
+                      </ul>
+                      <button type="button" class="ghost" (click)="applySuggestion()">
+                        {{ text.ai.apply }}
+                      </button>
+                    </div>
+                  </div>
+                  <p class="suggestion-empty" *ngIf="!suggestion && suggestionAttempted && !suggestionLoading">
+                    {{ text.ai.empty }}
+                  </p>
+                  <div class="raw-panel" *ngIf="detailRawText">
+                    <h4>{{ text.detail.rawTitle }}</h4>
+                    <p class="raw-hint">{{ text.detail.rawHint }}</p>
+                    <pre class="raw-preview">{{ detailRawText }}</pre>
+                  </div>
+                </form>
+              </td>
+            </tr>
+          </ng-container>
         </tbody>
       </table>
     </div>
   </section>
+
 </section>
