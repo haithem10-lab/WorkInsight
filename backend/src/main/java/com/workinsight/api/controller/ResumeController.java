@@ -48,14 +48,30 @@ public class ResumeController {
         .orElse(ResponseEntity.noContent().build());
   }
 
+  @PostMapping(value = "/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<ResumeProfileResponse> uploadPhoto(
+      @RequestParam("photo") MultipartFile photo,
+      @RequestParam("userId") String userId
+  ) {
+    if (!isNotBlank(userId)) {
+      return ResponseEntity.badRequest().build();
+    }
+    ResumeProfile profile = resumeService.updateProfilePhoto(photo, userId);
+    return ResponseEntity.ok(toResponse(profile));
+  }
+
   private ResumeProfileResponse toResponse(ResumeProfile profile) {
     return new ResumeProfileResponse(
         profile.getHeadline(),
         profile.getSummary(),
         profile.getSkills() == null ? java.util.List.of() : profile.getSkills(),
         profile.getLocations() == null ? java.util.List.of() : profile.getLocations(),
-        profile.getUpdatedAt()
+        profile.getUpdatedAt(),
+        profile.getPhotoData()
     );
   }
-}
 
+  private boolean isNotBlank(String value) {
+    return value != null && !value.isBlank();
+  }
+}

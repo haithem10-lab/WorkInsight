@@ -5,6 +5,63 @@
   padding-top: 6.5rem;
 }
 
+.dashboard.blocked-view {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blocked-card {
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 32px;
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  padding: clamp(2rem, 4vw, 3rem);
+  text-align: center;
+  color: #e2e8f0;
+  max-width: 540px;
+  box-shadow: 0 40px 80px rgba(2, 6, 23, 0.65);
+}
+
+.blocked-card .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  font-size: 0.75rem;
+  color: #c7d2fe;
+}
+
+.blocked-card h1 {
+  margin-bottom: 0.5rem;
+}
+
+.blocked-card p {
+  color: #cbd5f5;
+}
+
+.blocked-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.blocked-actions button {
+  border-radius: 999px;
+  padding: 0.85rem 1.6rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #6366f1, #0ea5e9);
+  color: #fff;
+}
+
+.blocked-actions .secondary-action {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #e0e7ff;
+}
+
 .header {
   display: flex;
   align-items: center;

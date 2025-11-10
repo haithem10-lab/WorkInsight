@@ -10,5 +10,9 @@ public interface JobOfferRepository extends MongoRepository<JobOffer, String> {
   List<JobOffer> findTop5ByUserIdOrderByCreatedAtDesc(String userId);
 
   Optional<JobOffer> findByIdAndUserId(String id, String userId);
+
+  long countByUserId(String userId);
+
+  Optional<JobOffer> findFirstByUserIdOrderByCreatedAtDesc(String userId);
 }
 

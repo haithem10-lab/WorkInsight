@@ -1,197 +1,323 @@
 <section class="profile-shell">
-  <div class="profile-card" *ngIf="user$ | async as user; else guestView">
-    <div class="profile-header">
-      <div class="avatar">{{ user.fullName?.charAt(0) || user.email.charAt(0) }}</div>
-      <div class="details">
-        <h1>{{ user.fullName || user.email }}</h1>
-        <p>{{ user.email }}</p>
-        <span class="plan-badge">{{ text.planBadge }}</span>
-      </div>
-      <div class="header-actions">
-        <button type="button" (click)="navigate('/upload')">{{ text.actions.submit }}</button>
-        <button type="button" class="secondary" (click)="navigate('/results')">{{ text.actions.results }}</button>
-        <button type="button" class="ghost" (click)="navigate('/matches')">CV matches</button>
-      </div>
-    </div>
-
-    <div class="profile-body">
-      <div class="status-row" *ngIf="loading">
-        <span class="muted">{{ text.status.loading }}</span>
-      </div>
-      <div class="status-row error" *ngIf="!loading && errorMessage">
-        {{ errorMessage }}
-      </div>
-
-      <section class="summary-grid" *ngIf="stats">
-        <article class="summary-card">
-          <span class="label">{{ text.summary.total.label }}</span>
-          <strong>{{ stats.totalOffers }}</strong>
-          <small>{{ text.summary.total.hint }}</small>
-        </article>
-        <article class="summary-card">
-          <span class="label">{{ text.summary.week.label }}</span>
-          <strong>{{ stats.offersThisWeek }}</strong>
-          <small>{{ text.summary.week.hint }}</small>
-        </article>
-        <article class="summary-card">
-          <span class="label">{{ text.summary.confidence.label }}</span>
-          <strong>{{ averageConfidence }}</strong>
-          <small>{{ text.summary.confidence.hint }}</small>
-        </article>
-        <article class="summary-card">
-          <span class="label">{{ text.summary.last.label }}</span>
-          <strong>{{ lastExtractionLabel }}</strong>
-          <small>{{ text.summary.last.hint }}</small>
-        </article>
-      </section>
-
-      <section class="panels">
-        <div class="panel" *ngIf="stats; else emptyStats">
-          <header>
-            <h2>{{ text.sources.title }}</h2>
-            <p>{{ text.sources.subtitle }}</p>
-          </header>
-          <ul class="source-list" *ngIf="sourceBreakdown.length; else noSources">
-            <li *ngFor="let item of sourceBreakdown">
-              <span>{{ item.label }}</span>
-              <span>{{ item.value }} - {{ item.percentage }}%</span>
-            </li>
-          </ul>
-          <ng-template #noSources>
-            <p class="muted">{{ text.sources.empty }}</p>
-          </ng-template>
-        </div>
-
-        <div class="panel resume-panel">
-          <header>
-            <h2>{{ text.resume.title }}</h2>
-            <p>{{ text.resume.subtitle }}</p>
-          </header>
-          <div class="resume-callout">
-            <div class="resume-icon-badge">
-              <svg width="32" height="38" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M21 2H9C6.79086 2 5 3.79086 5 6V32C5 34.2091 6.79086 36 9 36H23C25.2091 36 27 34.2091 27 32V12L21 2Z"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M21 2V12H27"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M11 23H21"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
-                <path
-                  d="M11 28H21"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linecap="round"
-                />
-              </svg>
-            </div>
-            <div class="resume-content">
-              <p class="resume-lede">{{ text.resume.noResume }}</p>
-              <div class="resume-actions">
-                <input
-                  #resumeInput
-                  type="file"
-                  accept=".pdf,.doc,.docx,.txt"
-                  (change)="onResumeSelected($event)"
-                  hidden
-                />
-                <button type="button" class="resume-upload-button" (click)="resumeInput.click()" [disabled]="resumeUploading">
-                  <span class="button-icon">
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M9 3V12M9 12L12.5 8.5M9 12L5.5 8.5"
-                        stroke="currentColor"
-                        stroke-width="1.6"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M4 14.5H14"
-                        stroke="currentColor"
-                        stroke-width="1.6"
-                        stroke-linecap="round"
-                      />
-                    </svg>
-                  </span>
-                  <span>{{ resumeUploading ? text.resume.uploading : text.resume.upload }}</span>
-                </button>
-              </div>
-              <p class="resume-note">{{ resumeUploadNote }}</p>
-              <div class="resume-status" *ngIf="resumeProfile?.updatedAt">
-                <span class="status-dot"></span>
-                {{ text.resume.lastUpdated }}
-                {{ resumeProfile?.updatedAt | date: 'medium':'':dateLocale }}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <header>
-            <h2>{{ text.notifications.title }}</h2>
-            <p>{{ text.notifications.subtitle }}</p>
-          </header>
-          <div class="toggle-list">
-            <label>
-              <input type="checkbox" [checked]="settings.alertLowConfidence" (change)="toggleSetting('alertLowConfidence')" />
-              {{ text.notifications.toggles.alertLowConfidence }}
-            </label>
-            <label>
-              <input type="checkbox" [checked]="settings.weeklyDigest" (change)="toggleSetting('weeklyDigest')" />
-              {{ text.notifications.toggles.weeklyDigest }}
-            </label>
-          </div>
-        </div>
-      </section>
-
-      <ng-template #emptyStats>
-        <div class="panel muted-panel">
-          <h2>{{ text.emptyStats.title }}</h2>
-          <p class="muted">{{ text.emptyStats.description }}</p>
-        </div>
-      </ng-template>
-
-      <section class="recent-panel">
-        <header>
-          <h2>{{ text.recent.title }}</h2>
-          <button type="button" class="link" (click)="navigate('/results')">{{ text.recent.viewAll }}</button>
-        </header>
-        <ul class="recent-list" *ngIf="recentOffers.length; else noRecent">
-          <li *ngFor="let offer of recentOffers">
+  <ng-container *ngIf="user$ | async as user; else guestView">
+    <ng-container *ngIf="isAdminUser; else memberView">
+      <div class="admin-card">
+        <header class="admin-hero">
+          <div class="admin-identity">
+            <div class="admin-avatar">{{ userInitials(user) }}</div>
             <div>
-              <strong>{{ offer.title || text.recent.untitled }}</strong>
-              <span class="meta">
-                {{ offer.sourceType || text.recent.fallbackSource }} -
-                {{ offer.createdAt ? (offer.createdAt | date: 'medium':'':dateLocale) : text.recent.pending }}
-              </span>
+              <p class="admin-eyebrow">{{ text.admin.heroEyebrow }}</p>
+              <h1>{{ user.fullName || user.email }}</h1>
+              <p class="admin-mail">{{ user.email }}</p>
             </div>
-            <span class="confidence" [class.low]="(offer.confidenceScore ?? 0) < 0.6">
-              {{ offer.confidenceScore ? (offer.confidenceScore * 100 | number: '1.0-0') + '%' : text.recent.noConfidence }}
-            </span>
-          </li>
-        </ul>
-        <ng-template #noRecent>
-          <p class="muted">{{ text.recent.empty }}</p>
-        </ng-template>
-      </section>
-    </div>
+          </div>
+          <div class="admin-hero-actions">
+            <button type="button" (click)="goToAdminDashboard()">
+              {{ text.admin.quickActions.controlCenter }}
+            </button>
+            <button type="button" class="ghost" (click)="goToAdminDashboard()">
+              {{ text.admin.quickActions.pending }}
+            </button>
+          </div>
+        </header>
+        <p class="admin-subtitle">{{ text.admin.heroSubtitle }}</p>
 
-    <div class="profile-footer">
-      <button type="button" class="logout" (click)="signOut()">{{ text.actions.logout }}</button>
-    </div>
-  </div>
+        <section class="admin-summary-grid">
+          <article class="summary-card">
+            <span class="label">{{ text.admin.summary.total.label }}</span>
+            <strong>{{ adminStats.total }}</strong>
+            <small>{{ text.admin.summary.total.hint }}</small>
+          </article>
+          <article class="summary-card">
+            <span class="label">{{ text.admin.summary.active.label }}</span>
+            <strong>{{ adminStats.active }}</strong>
+            <small>{{ text.admin.summary.active.hint }}</small>
+          </article>
+          <article class="summary-card danger">
+            <span class="label">{{ text.admin.summary.blocked.label }}</span>
+            <strong>{{ adminStats.blocked }}</strong>
+            <small>{{ text.admin.summary.blocked.hint }}</small>
+          </article>
+          <article class="summary-card warning">
+            <span class="label">{{ text.admin.summary.pending.label }}</span>
+            <strong>{{ adminStats.pending }}</strong>
+            <small>{{ text.admin.summary.pending.hint }}</small>
+          </article>
+        </section>
+
+        <div class="status-row" *ngIf="adminLoading">
+          <span class="muted">{{ text.status.loading }}</span>
+        </div>
+        <div class="status-row error" *ngIf="!adminLoading && adminError">
+          {{ adminError }}
+        </div>
+
+        <section class="admin-panels">
+          <article class="panel">
+            <header>
+              <h2>{{ text.admin.panels.pending.title }}</h2>
+            </header>
+            <ul *ngIf="adminPending.length; else noPending">
+              <li *ngFor="let item of adminPending">
+                <div>
+                  <strong>{{ item.fullName || item.email }}</strong>
+                  <p>{{ item.email }}</p>
+                  <span class="meta">{{ formatAdminDate(item.createdAt) }}</span>
+                </div>
+                <button type="button" class="link-button small-link" (click)="navigate('/admin')">
+                  {{ text.admin.panels.pending.action }}
+                </button>
+              </li>
+            </ul>
+            <ng-template #noPending>
+              <p class="muted">{{ text.admin.panels.pending.empty }}</p>
+            </ng-template>
+          </article>
+
+          <article class="panel">
+            <header>
+              <h2>{{ text.admin.panels.blocked.title }}</h2>
+            </header>
+            <ul *ngIf="adminBlocked.length; else noBlocked">
+              <li *ngFor="let item of adminBlocked">
+                <div>
+                  <strong>{{ item.fullName || item.email }}</strong>
+                  <p>{{ item.email }}</p>
+                  <span class="meta">{{ formatAdminDate(item.statusUpdatedAt || item.createdAt) }}</span>
+                  <span class="reason" *ngIf="item.statusReason">{{ item.statusReason }}</span>
+                </div>
+                <span class="badge badge--blocked">Blocked</span>
+              </li>
+            </ul>
+            <ng-template #noBlocked>
+              <p class="muted">{{ text.admin.panels.blocked.empty }}</p>
+            </ng-template>
+          </article>
+
+          <article class="panel">
+            <header>
+              <h2>{{ text.admin.panels.recent.title }}</h2>
+            </header>
+            <ul *ngIf="adminRecent.length; else noRecent">
+              <li *ngFor="let item of adminRecent">
+                <div>
+                  <strong>{{ item.fullName || item.email }}</strong>
+                  <p>{{ item.email }}</p>
+                  <span class="meta">{{ formatAdminDate(item.createdAt) }}</span>
+                </div>
+                <span
+                  class="badge"
+                  [class.badge--pending]="!item.emailVerified"
+                >
+                  {{ item.emailVerified ? 'Verified' : 'Pending' }}
+                </span>
+              </li>
+            </ul>
+            <ng-template #noRecent>
+              <p class="muted">{{ text.admin.panels.recent.empty }}</p>
+            </ng-template>
+          </article>
+        </section>
+        <div class="admin-footer">
+          <button type="button" class="ghost" (click)="goToAdminDashboard()">
+            {{ text.admin.quickActions.controlCenter }}
+          </button>
+          <button type="button" class="logout" (click)="signOut()">{{ text.actions.logout }}</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #memberView>
+      <div class="profile-card">
+        <div class="profile-header">
+          <div class="avatar-wrapper">
+            <div class="avatar" [class.has-photo]="resumeProfile?.photoData">
+              <img *ngIf="resumeProfile?.photoData" [src]="resumeProfile?.photoData" alt="Profile photo" />
+              <span *ngIf="!resumeProfile?.photoData">{{ userInitials(user) }}</span>
+            </div>
+            <div class="avatar-actions">
+              <input #photoInput type="file" accept="image/*" (change)="onPhotoSelected($event)" hidden />
+              <button type="button" class="avatar-photo-button" (click)="photoInput.click()" [disabled]="photoUploading">
+                {{ photoUploading ? text.photo.uploading : text.photo.upload }}
+              </button>
+            </div>
+          </div>
+          <div class="details">
+            <h1>{{ user.fullName || user.email }}</h1>
+            <p>{{ user.email }}</p>
+            <span class="plan-badge">{{ text.planBadge }}</span>
+          </div>
+          <div class="header-actions">
+            <button type="button" (click)="navigate('/upload')">{{ text.actions.submit }}</button>
+            <button type="button" class="secondary" (click)="navigate('/results')">{{ text.actions.results }}</button>
+            <button type="button" class="ghost" (click)="navigate('/matches')">CV matches</button>
+          </div>
+        </div>
+
+        <div class="profile-body">
+          <div class="status-row" *ngIf="loading">
+            <span class="muted">{{ text.status.loading }}</span>
+          </div>
+          <div class="status-row error" *ngIf="!loading && errorMessage">
+            {{ errorMessage }}
+          </div>
+
+          <section class="summary-grid" *ngIf="stats">
+            <article class="summary-card">
+              <span class="label">{{ text.summary.total.label }}</span>
+              <strong>{{ stats.totalOffers }}</strong>
+              <small>{{ text.summary.total.hint }}</small>
+            </article>
+            <article class="summary-card">
+              <span class="label">{{ text.summary.week.label }}</span>
+              <strong>{{ stats.offersThisWeek }}</strong>
+              <small>{{ text.summary.week.hint }}</small>
+            </article>
+            <article class="summary-card">
+              <span class="label">{{ text.summary.confidence.label }}</span>
+              <strong>{{ averageConfidence }}</strong>
+              <small>{{ text.summary.confidence.hint }}</small>
+            </article>
+            <article class="summary-card">
+              <span class="label">{{ text.summary.last.label }}</span>
+              <strong>{{ lastExtractionLabel }}</strong>
+              <small>{{ text.summary.last.hint }}</small>
+            </article>
+          </section>
+
+          <section class="panels">
+            <div class="panel" *ngIf="stats; else emptyStats">
+              <header>
+                <h2>{{ text.sources.title }}</h2>
+                <p>{{ text.sources.subtitle }}</p>
+              </header>
+              <ul class="source-list" *ngIf="sourceBreakdown.length; else noSources">
+                <li *ngFor="let item of sourceBreakdown">
+                  <span>{{ item.label }}</span>
+                  <span>{{ item.value }} - {{ item.percentage }}%</span>
+                </li>
+              </ul>
+              <ng-template #noSources>
+                <p class="muted">{{ text.sources.empty }}</p>
+              </ng-template>
+            </div>
+
+            <div class="panel resume-panel">
+              <header>
+                <h2>{{ text.resume.title }}</h2>
+                <p>{{ text.resume.subtitle }}</p>
+              </header>
+              <div class="resume-callout">
+                <div class="resume-icon-badge">
+                  <svg width="32" height="38" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M21 2H9C6.79086 2 5 3.79086 5 6V32C5 34.2091 6.79086 36 9 36H23C25.2091 36 27 34.2091 27 32V12L21 2Z"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M21 2V12H27"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path d="M11 23H21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M11 28H21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+                  </svg>
+                </div>
+                <div class="resume-content">
+                  <p class="resume-lede">{{ text.resume.noResume }}</p>
+                  <div class="resume-actions">
+                    <input #resumeInput type="file" accept=".pdf,.doc,.docx,.txt" (change)="onResumeSelected($event)" hidden />
+                    <button
+                      type="button"
+                      class="resume-upload-button"
+                      (click)="resumeInput.click()"
+                      [disabled]="resumeUploading"
+                    >
+                      <span class="button-icon">
+                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path
+                            d="M9 3V12M9 12L12.5 8.5M9 12L5.5 8.5"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                          <path d="M4 14.5H14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                        </svg>
+                      </span>
+                      <span>{{ resumeUploading ? text.resume.uploading : text.resume.upload }}</span>
+                    </button>
+                  </div>
+                  <p class="resume-note">{{ resumeUploadNote }}</p>
+                  <div class="resume-status" *ngIf="resumeProfile?.updatedAt">
+                    <span class="status-dot"></span>
+                    {{ text.resume.lastUpdated }}
+                    {{ resumeProfile?.updatedAt | date: 'medium':'':dateLocale }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <header>
+                <h2>{{ text.notifications.title }}</h2>
+                <p>{{ text.notifications.subtitle }}</p>
+              </header>
+              <div class="toggle-list">
+                <label>
+                  <input type="checkbox" [checked]="settings.alertLowConfidence" (change)="toggleSetting('alertLowConfidence')" />
+                  {{ text.notifications.toggles.alertLowConfidence }}
+                </label>
+                <label>
+                  <input type="checkbox" [checked]="settings.weeklyDigest" (change)="toggleSetting('weeklyDigest')" />
+                  {{ text.notifications.toggles.weeklyDigest }}
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <ng-template #emptyStats>
+            <div class="panel muted-panel">
+              <h2>{{ text.emptyStats.title }}</h2>
+              <p class="muted">{{ text.emptyStats.description }}</p>
+            </div>
+          </ng-template>
+
+          <section class="recent-panel">
+            <header>
+              <h2>{{ text.recent.title }}</h2>
+              <button type="button" class="link" (click)="navigate('/results')">{{ text.recent.viewAll }}</button>
+            </header>
+            <ul class="recent-list" *ngIf="recentOffers.length; else noRecentMember">
+              <li *ngFor="let offer of recentOffers">
+                <div>
+                  <strong>{{ offer.title || text.recent.untitled }}</strong>
+                  <span class="meta">
+                    {{ offer.sourceType || text.recent.fallbackSource }} -
+                    {{ offer.createdAt ? (offer.createdAt | date: 'medium':'':dateLocale) : text.recent.pending }}
+                  </span>
+                </div>
+                <span class="confidence" [class.low]="(offer.confidenceScore ?? 0) < 0.6">
+                  {{ offer.confidenceScore ? (offer.confidenceScore * 100 | number: '1.0-0') + '%' : text.recent.noConfidence }}
+                </span>
+              </li>
+            </ul>
+            <ng-template #noRecentMember>
+              <p class="muted">{{ text.recent.empty }}</p>
+            </ng-template>
+          </section>
+        </div>
+
+        <div class="profile-footer">
+          <button type="button" class="logout" (click)="signOut()">{{ text.actions.logout }}</button>
+        </div>
+      </div>
+    </ng-template>
+  </ng-container>
 
   <ng-template #guestView>
     <div class="profile-card empty">
@@ -204,5 +330,3 @@
     </div>
   </ng-template>
 </section>
-
-

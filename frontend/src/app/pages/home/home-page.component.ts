@@ -69,7 +69,7 @@ const HOME_COPY: Record<UiLanguage, HomeCopy> = {
     hero: {
       title: 'Bring every job offer into',
       highlight: 'one intelligent workspace',
-      lead: 'WorkInsight ingests PDFs, screenshots, spreadsheets, and career site links, then turns them into structured data ready for sourcing, outreach, and reporting across your hiring stack.',
+      lead: 'WorkInsight ingests PDFs, screenshots, spreadsheets, and career site links, then turns them into structured data ready for sourcing, outreach, and reporting across any workflow.',
       primaryCta: 'Start extracting',
       secondaryCta: 'Connect my workspace',
       supportLink: 'See supported formats',
@@ -85,8 +85,8 @@ const HOME_COPY: Record<UiLanguage, HomeCopy> = {
       floatingTag: 'Unify job data'
     },
     features: {
-      heading: 'Why talent teams rely on WorkInsight',
-      subtitle: 'Purpose-built for operations, campus hiring, and agency teams that need reliable data from every job source.',
+      heading: 'Why teams rely on WorkInsight',
+      subtitle: 'Purpose-built for operations, analysts, creators, and agencies that need reliable data from every job source.',
       items: [
         {
           title: 'Universal ingestion',
@@ -104,7 +104,7 @@ const HOME_COPY: Record<UiLanguage, HomeCopy> = {
     },
     useCases: {
       eyebrow: 'Practical examples',
-      title: 'Actionable insights across every hiring channel.',
+      title: 'Actionable insights across every sourcing channel.',
       description: 'Upload job packs from email, drag in screenshots from the field, or sync with career portals. Push clean data to Sheets, CRMs, or automation tools in minutes.',
       items: [
         {

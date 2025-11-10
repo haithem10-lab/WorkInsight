@@ -8,7 +8,7 @@ public record ResumeProfileResponse(
     String summary,
     List<String> skills,
     List<String> preferredLocations,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    String photoData
 ) {
 }
-

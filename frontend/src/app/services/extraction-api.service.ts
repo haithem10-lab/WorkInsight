@@ -54,6 +54,7 @@ export interface ResumeProfile {
   skills: string[];
   preferredLocations: string[];
   updatedAt?: string | null;
+  photoData?: string | null;
 }
 
 export interface JobRecommendation {
@@ -135,6 +136,13 @@ export class ExtractionApiService {
     const payload = new FormData();
     payload.append('resume', file);
     return lastValueFrom(this.http.post<ResumeProfile>(`${this.baseUrl}/resume`, payload, { params }));
+  }
+
+  uploadProfilePhoto(file: File): Promise<ResumeProfile> {
+    const params = this.buildParams();
+    const payload = new FormData();
+    payload.append('photo', file);
+    return lastValueFrom(this.http.post<ResumeProfile>(`${this.baseUrl}/resume/photo`, payload, { params }));
   }
 
   async getResumeProfile(): Promise<ResumeProfile | null> {

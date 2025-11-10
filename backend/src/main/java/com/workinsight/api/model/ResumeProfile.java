@@ -18,6 +18,9 @@ public class ResumeProfile {
   private String rawText;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private String photoData;
+  private String photoContentType;
+  private LocalDateTime photoUpdatedAt;
 
   public ResumeProfile() {
   }
@@ -112,5 +115,28 @@ public class ResumeProfile {
   public void setUpdatedAt(LocalDateTime updatedAt) {
     this.updatedAt = updatedAt;
   }
-}
 
+  public String getPhotoData() {
+    return photoData;
+  }
+
+  public void setPhotoData(String photoData) {
+    this.photoData = photoData;
+  }
+
+  public String getPhotoContentType() {
+    return photoContentType;
+  }
+
+  public void setPhotoContentType(String photoContentType) {
+    this.photoContentType = photoContentType;
+  }
+
+  public LocalDateTime getPhotoUpdatedAt() {
+    return photoUpdatedAt;
+  }
+
+  public void setPhotoUpdatedAt(LocalDateTime photoUpdatedAt) {
+    this.photoUpdatedAt = photoUpdatedAt;
+  }
+}

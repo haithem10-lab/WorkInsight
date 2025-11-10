@@ -218,6 +218,10 @@ export class NavbarComponent implements OnInit {
     this.languageMenuOpen = false;
     this.mobileMenuOpen = false;
   }
+
+  userHasAdminRole(user: SessionUser | null): boolean {
+    return !!user?.roles?.includes('ROLE_ADMIN');
+  }
 }
 
 

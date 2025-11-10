@@ -1,4 +1,4 @@
-<section class="dashboard">
+<section class="dashboard" *ngIf="!isAdminView; else adminLocked">
   <div class="header">
     <div>
       <h1>{{ text.dashboardTitle }}</h1>
@@ -431,3 +431,20 @@
   </section>
 
 </section>
+
+<ng-template #adminLocked>
+  <section class="dashboard blocked-view">
+    <div class="blocked-card">
+      <p class="eyebrow">Admin lite</p>
+      <h1>Results dashboard unavailable</h1>
+      <p>
+        This space is reserved for workspace members. Head to the admin control center to manage users and email
+        verifications.
+      </p>
+      <div class="blocked-actions">
+        <button type="button" (click)="goToAdminDashboard()">Open control center</button>
+        <button type="button" class="secondary-action" (click)="goToAdminProfile()">Back to admin profile</button>
+      </div>
+    </div>
+  </section>
+</ng-template>

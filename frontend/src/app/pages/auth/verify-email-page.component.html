@@ -1,0 +1,13 @@
+<section class="auth-shell">
+  <div class="card">
+    <span class="badge">{{ text.badge }}</span>
+    <div class="header">
+      <h1>{{ title }}</h1>
+      <p>{{ message }}</p>
+    </div>
+
+    <div class="footer" *ngIf="showCta">
+      <button type="button" (click)="goToSignIn()">{{ text.cta }}</button>
+    </div>
+  </div>
+</section>

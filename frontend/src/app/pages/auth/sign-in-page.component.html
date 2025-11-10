@@ -26,6 +26,10 @@
         <span>{{ text.remember }}</span>
       </label>
 
+      <div class="forgot-link">
+        <a routerLink="/forgot-password">{{ text.forgot }}</a>
+      </div>
+
       <button type="submit" [disabled]="loading">
         {{ loading ? text.ctaLoading : text.cta }}
       </button>

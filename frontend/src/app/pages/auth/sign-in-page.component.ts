@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+﻿import { Component, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -8,7 +8,7 @@ import { AuthApiService } from '../../services/auth-api.service';
 import { LanguageService, UiLanguage } from '../../services/language.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-type SignInErrorKey = 'invalidCredentials' | 'generic' | 'session';
+type SignInErrorKey = 'invalidCredentials' | 'generic' | 'session' | 'notVerified' | 'blocked';
 
 interface SignInCopy {
   badge: string;
@@ -21,6 +21,7 @@ interface SignInCopy {
   passwordPlaceholder: string;
   passwordError: string;
   remember: string;
+  forgot: string;
   cta: string;
   ctaLoading: string;
   footerPrompt: string;
@@ -40,6 +41,7 @@ const SIGN_IN_COPY: Record<UiLanguage, SignInCopy> = {
     passwordPlaceholder: 'Minimum 6 characters',
     passwordError: 'Password must contain at least 6 characters.',
     remember: 'Remember me',
+    forgot: 'Forgot password?',
     cta: 'Sign in',
     ctaLoading: 'Signing in...',
     footerPrompt: 'New to WorkInsight?',
@@ -47,28 +49,33 @@ const SIGN_IN_COPY: Record<UiLanguage, SignInCopy> = {
     errors: {
       invalidCredentials: 'Invalid credentials. Check your email and password.',
       generic: 'Cannot sign in right now. Please try again.',
-      session: 'Unable to retrieve your session.'
+      session: 'Unable to retrieve your session.',
+      notVerified: 'Please verify your email before signing in.',
+      blocked: 'Your account is currently blocked. Contact the team for assistance.'
     }
   },
   fr: {
     badge: 'Intelligence recrutement',
     title: 'Heureux de vous revoir',
-    subtitle: 'Connectez-vous pour orchestrer la collecte de données sur toutes vos sources d\'offres.',
+    subtitle: 'Connectez-vous pour orchestrer la collecte de donnees sur toutes vos sources d\'offres.',
     emailLabel: 'Email',
     emailPlaceholder: 'vous@entreprise.com',
     emailError: 'Saisissez un email valide.',
     passwordLabel: 'Mot de passe',
-    passwordPlaceholder: 'Minimum 6 caractères',
-    passwordError: 'Le mot de passe doit contenir au moins 6 caractères.',
+    passwordPlaceholder: 'Minimum 6 caracteres',
+    passwordError: 'Le mot de passe doit contenir au moins 6 caracteres.',
     remember: 'Se souvenir de moi',
+    forgot: 'Mot de passe oublie ?',
     cta: 'Se connecter',
     ctaLoading: 'Connexion...',
     footerPrompt: 'Nouveau sur WorkInsight ?',
-    footerLink: 'Créer un compte',
+    footerLink: 'Creer un compte',
     errors: {
-      invalidCredentials: 'Identifiants invalides. Vérifiez votre email et mot de passe.',
-      generic: 'Impossible de se connecter pour le moment. Veuillez réessayer.',
-      session: 'Impossible de récupérer votre session.'
+      invalidCredentials: 'Identifiants invalides. Verifiez votre email et mot de passe.',
+      generic: 'Impossible de se connecter pour le moment. Veuillez reessayer.',
+      session: 'Impossible de recuperer votre session.',
+      notVerified: 'Confirmez votre adresse email avant de vous connecter.',
+      blocked: 'Votre compte est bloque. Merci de contacter le support.'
     }
   }
 };
@@ -120,16 +127,24 @@ export class SignInPageComponent {
     try {
       const email = (this.form.value.email ?? '').trim();
       const password = this.form.value.password ?? '';
-      const user = await this.authApi.signIn({
-        email,
-        password
+      const auth = await this.authApi.signIn({ email, password });
+      this.session.setCurrentUser({
+        id: auth.user.id,
+        email: auth.user.email,
+        fullName: auth.user.fullName,
+        accessToken: auth.accessToken,
+        roles: auth.user.roles,
+        accountStatus: auth.user.accountStatus
       });
-      this.session.setCurrentUser(user);
-      this.router.navigate(['/']);
+      await this.router.navigate(['/']);
     } catch (error) {
       if (error instanceof HttpErrorResponse) {
         if (error.status === 401) {
           this.setError('invalidCredentials');
+        } else if (error.status === 403) {
+          this.setError('notVerified');
+        } else if (error.status === 423) {
+          this.setError('blocked');
         } else {
           this.setError('generic');
         }
@@ -149,3 +164,4 @@ export class SignInPageComponent {
     this.errorMessage = key ? this.text.errors[key] : '';
   }
 }
+

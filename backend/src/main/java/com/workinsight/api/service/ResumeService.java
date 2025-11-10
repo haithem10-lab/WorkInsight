@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -243,5 +244,41 @@ public class ResumeService {
   private boolean isNotBlank(String value) {
     return value != null && !value.isBlank();
   }
-}
 
+  public ResumeProfile updateProfilePhoto(MultipartFile photo, String userId) {
+    if (photo == null || photo.isEmpty()) {
+      throw new IllegalArgumentException("Photo file is required");
+    }
+    if (!isNotBlank(userId)) {
+      throw new IllegalArgumentException("userId is required");
+    }
+    String normalizedUserId = userId.trim().toLowerCase(Locale.ROOT);
+    String contentType = Optional.ofNullable(photo.getContentType())
+        .filter(this::isNotBlank)
+        .orElse("application/octet-stream");
+    String dataUri;
+    try {
+      String base64 = Base64.getEncoder().encodeToString(photo.getBytes());
+      dataUri = "data:" + contentType + ";base64," + base64;
+    } catch (IOException ex) {
+      throw new IllegalArgumentException("Unable to read photo: " + ex.getMessage(), ex);
+    }
+    LocalDateTime now = LocalDateTime.now();
+    ResumeProfile profile = repository.findByUserId(normalizedUserId)
+        .orElseGet(() -> new ResumeProfile(
+            normalizedUserId,
+            "",
+            "",
+            List.of(),
+            List.of(),
+            "",
+            now,
+            now
+        ));
+    profile.setPhotoData(dataUri);
+    profile.setPhotoContentType(contentType);
+    profile.setPhotoUpdatedAt(now);
+    profile.setUpdatedAt(now);
+    return repository.save(profile);
+  }
+}

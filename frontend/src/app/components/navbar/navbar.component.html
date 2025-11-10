@@ -80,7 +80,8 @@
       <ng-container *ngIf="currentUser$ | async as user; else mobileGuestActions">
         <div class="mobile-user-actions">
           <button type="button" (click)="navigateTo('/profile')">{{ text.profile }}</button>
-          <button type="button" (click)="navigateTo('/results')">{{ text.results }}</button>
+          <button type="button" *ngIf="!userHasAdminRole(user)" (click)="navigateTo('/results')">{{ text.results }}</button>
+          <button type="button" *ngIf="userHasAdminRole(user)" (click)="navigateTo('/admin')">Admin console</button>
           <button type="button" class="logout" (click)="logout()">{{ text.logout }}</button>
         </div>
       </ng-container>
@@ -171,7 +172,10 @@
     <ng-container *ngIf="currentUser$ | async as user; else desktopGuestActions">
       <div class="actions logged-in">
         <button type="button" class="avatar-button" (click)="toggleUserMenu($event)">
-          <span class="avatar-initial">{{ getUserInitial(user) }}</span>
+          <span class="avatar-chip" [class.has-photo]="user.photoData">
+            <img *ngIf="user.photoData" [src]="user.photoData" alt="Profile photo" />
+            <span class="avatar-initial" *ngIf="!user.photoData">{{ getUserInitial(user) }}</span>
+          </span>
           <span class="avatar-name">{{ getUserGreeting(user) }}</span>
           <span class="chevron chevron--small" [class.open]="userMenuOpen">
             <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
@@ -181,7 +185,8 @@
         </button>
         <div class="user-dropdown" *ngIf="userMenuOpen" (click)="$event.stopPropagation()">
           <button type="button" (click)="navigateTo('/profile')">{{ text.profile }}</button>
-          <button type="button" (click)="navigateTo('/results')">{{ text.results }}</button>
+          <button type="button" *ngIf="!userHasAdminRole(user)" (click)="navigateTo('/results')">{{ text.results }}</button>
+          <button type="button" *ngIf="userHasAdminRole(user)" (click)="navigateTo('/admin')">Admin console</button>
           <hr />
           <button type="button" class="logout" (click)="logout()">{{ text.logout }}</button>
         </div>

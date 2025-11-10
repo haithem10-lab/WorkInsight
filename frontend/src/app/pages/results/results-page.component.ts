@@ -435,6 +435,7 @@ export class ResultsPageComponent implements AfterViewInit {
     week: '#6366f1',
     older: '#94a3b8'
   };
+  isAdminView = false;
 
   constructor() {
     this.languageService.language$
@@ -444,7 +445,20 @@ export class ResultsPageComponent implements AfterViewInit {
         this.requestMapRefresh();
       });
 
-    this.refresh();
+    this.session.currentUser$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(user => {
+        const adminNow = !!user && this.session.isAdmin();
+        const changed = adminNow !== this.isAdminView;
+        this.isAdminView = adminNow;
+        if (!this.isAdminView && changed) {
+          this.refresh();
+        }
+      });
+
+    if (!this.session.isAdmin()) {
+      this.refresh();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -461,7 +475,24 @@ export class ResultsPageComponent implements AfterViewInit {
     this.router.navigate(['/upload']);
   }
 
+  goToAdminDashboard(): void {
+    this.router.navigate(['/admin']);
+  }
+
+  goToAdminProfile(): void {
+    this.router.navigate(['/profile']);
+  }
+
   async refresh(): Promise<void> {
+    if (this.isAdminView) {
+      this.isLoading = false;
+      this.offers = [];
+      this.filteredOffers = [];
+      this.stats = null;
+      this.mapHasData = false;
+      this.errorMessage = '';
+      return;
+    }
     this.isLoading = true;
     this.errorMessage = '';
     this.collapseDetail();

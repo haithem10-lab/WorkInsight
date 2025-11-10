@@ -1,0 +1,122 @@
+<ng-container *ngIf="canAccess(); else adminForbidden">
+  <section class="admin-page">
+    <header class="page-header">
+      <div class="header-copy">
+        <p class="eyebrow">Admin lite</p>
+        <h1>Workspace control center</h1>
+        <p class="subtitle">
+          Review every account, keep your data safe, and step in quickly when something looks suspicious.
+        </p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="refresh-button" (click)="refresh()" [disabled]="loading()">
+          <span class="refresh-icon" [class.spin]="loading()">&#10227;</span>
+          <span>{{ loading() ? 'Refreshing...' : 'Refresh data' }}</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="filter-row">
+      <button type="button" [class.active]="filter() === 'all'" (click)="setFilter('all')">All</button>
+      <button type="button" [class.active]="filter() === 'active'" (click)="setFilter('active')">Active</button>
+      <button type="button" [class.active]="filter() === 'blocked'" (click)="setFilter('blocked')">Blocked</button>
+      <button type="button" [class.active]="filter() === 'pending'" (click)="setFilter('pending')">Pending email</button>
+    </div>
+
+    <div class="status-area" *ngIf="error()">
+      <div class="error-banner">
+        {{ error() }}
+      </div>
+    </div>
+
+    <div class="loading-state" *ngIf="loading()">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>Fetching accounts...</p>
+    </div>
+
+    <ng-container *ngIf="!loading()">
+      <div class="empty-state" *ngIf="filteredUsers().length === 0">
+        <p>No users match this filter.</p>
+      </div>
+
+      <div class="user-grid" *ngIf="filteredUsers().length > 0">
+        <article class="user-card" *ngFor="let user of filteredUsers(); trackBy: trackById">
+          <header class="user-header">
+            <div>
+              <p class="user-name">{{ user.fullName || 'Unnamed user' }}</p>
+              <p class="user-email">{{ user.email }}</p>
+            </div>
+            <div class="badge-row">
+              <span class="badge" [class.badge--blocked]="user.accountStatus === 'BLOCKED'">
+                {{ statusLabel(user) }}
+              </span>
+              <span class="badge badge--role" *ngFor="let role of user.roles">
+                {{ role.replace('ROLE_', '') }}
+              </span>
+            </div>
+          </header>
+
+          <div class="user-stats">
+            <div>
+              <p class="stat-label">Extractions</p>
+              <p class="stat-value">{{ user.extractionCount | number }}</p>
+            </div>
+            <div>
+              <p class="stat-label">Last extraction</p>
+              <p class="stat-value">
+                {{ user.lastExtractionAt ? (user.lastExtractionAt | date: 'medium') : 'No data yet' }}
+              </p>
+            </div>
+            <div>
+              <p class="stat-label">Joined</p>
+              <p class="stat-value">{{ user.createdAt ? (user.createdAt | date: 'mediumDate') : 'Unknown' }}</p>
+            </div>
+          </div>
+
+          <div class="status-note" *ngIf="user.statusReason">
+            <p>Reason: {{ user.statusReason }}</p>
+          </div>
+
+          <div class="user-actions">
+            <button
+              type="button"
+              class="ghost"
+              *ngIf="!user.emailVerified"
+              (click)="resendVerification(user)"
+              [disabled]="isActionRunning(user.id, 'resend')"
+            >
+              <span>Resend verification</span>
+            </button>
+            <button
+              type="button"
+              class="danger"
+              *ngIf="user.accountStatus !== 'BLOCKED'"
+              (click)="blockUser(user)"
+              [disabled]="isActionRunning(user.id, 'block')"
+            >
+              Block account
+            </button>
+            <button
+              type="button"
+              class="primary"
+              *ngIf="user.accountStatus === 'BLOCKED'"
+              (click)="unblockUser(user)"
+              [disabled]="isActionRunning(user.id, 'unblock')"
+            >
+              Restore access
+            </button>
+          </div>
+        </article>
+      </div>
+    </ng-container>
+  </section>
+</ng-container>
+
+<ng-template #adminForbidden>
+  <section class="admin-page">
+    <div class="forbidden-card">
+      <h1>Restricted area</h1>
+      <p>You need an administrator role to access this console.</p>
+    </div>
+  </section>
+</ng-template>

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthSessionService } from '../../services/auth-session.service';
+import { AdminApiService, AdminUser } from '../../services/admin-api.service';
 import {
   ExtractionApiService,
   JobDashboardStats,
@@ -57,6 +58,12 @@ interface ProfileCopy {
     skillsLabel: string;
     locationsLabel: string;
   };
+  photo: {
+    upload: string;
+    uploading: string;
+    uploadSuccess: string;
+    uploadError: string;
+  };
   recommendations: {
     title: string;
     subtitle: string;
@@ -90,6 +97,25 @@ interface ProfileCopy {
     description: string;
     signup: string;
     signin: string;
+  };
+  admin: {
+    heroEyebrow: string;
+    heroSubtitle: string;
+    quickActions: {
+      controlCenter: string;
+      pending: string;
+    };
+    summary: {
+      total: { label: string; hint: string };
+      active: { label: string; hint: string };
+      blocked: { label: string; hint: string };
+      pending: { label: string; hint: string };
+    };
+    panels: {
+      pending: { title: string; empty: string; action: string };
+      blocked: { title: string; empty: string };
+      recent: { title: string; empty: string };
+    };
   };
 }
 
@@ -129,13 +155,19 @@ const PROFILE_COPY: Record<UiLanguage, ProfileCopy> = {
       subtitle: 'Upload a CV to unlock tailored job recommendations.',
       upload: 'Upload resume',
       uploading: 'Uploading...',
-      uploaded: 'R?sum? processed successfully. Recommendations updated.',
+      uploaded: 'Resume processed successfully. Recommendations updated.',
       uploadError: 'Unable to process your resume right now.',
       lastUpdated: 'Last updated',
       noResume: 'No resume on file yet. Upload one to get personalised matches.',
-      noHeadline: 'R?sum? profile',
+      noHeadline: 'Resume profile',
       skillsLabel: 'Key skills',
       locationsLabel: 'Preferred locations'
+    },
+    photo: {
+      upload: 'Update photo',
+      uploading: 'Uploading...',
+      uploadSuccess: 'Profile photo updated.',
+      uploadError: 'Could not upload photo. Try another image.'
     },
     recommendations: {
       title: 'Recommended for you',
@@ -167,9 +199,28 @@ const PROFILE_COPY: Record<UiLanguage, ProfileCopy> = {
     },
     guest: {
       title: 'You are not signed in',
-      description: 'Create an account or sign in to access your saved extractions and update your profile.',
+      description: 'Create an account or sign in to access your extraction history and update your profile.',
       signup: 'Create account',
       signin: 'Sign in'
+    },
+    admin: {
+      heroEyebrow: 'Admin lite',
+      heroSubtitle: 'Monitor every workspace account, unblock teammates, and resend verification mails in seconds.',
+      quickActions: {
+        controlCenter: 'Open control center',
+        pending: 'Review pending email'
+      },
+      summary: {
+        total: { label: 'Workspace users', hint: 'All accounts' },
+        active: { label: 'Active', hint: 'Can sign in' },
+        blocked: { label: 'Blocked', hint: 'Access disabled' },
+        pending: { label: 'Pending email', hint: 'Awaiting verification' }
+      },
+      panels: {
+        pending: { title: 'Pending verification', empty: 'Everyone is verified right now.', action: 'Manage' },
+        blocked: { title: 'Recently blocked', empty: 'No blocked accounts.' },
+        recent: { title: 'Latest sign-ins', empty: 'No sign-ins recorded yet.' }
+      }
     }
   },
   fr: {
@@ -215,6 +266,12 @@ const PROFILE_COPY: Record<UiLanguage, ProfileCopy> = {
       skillsLabel: 'Competences clefs',
       locationsLabel: 'Localisations preferees'
     },
+    photo: {
+      upload: 'Mettre a jour la photo',
+      uploading: 'Televersement...',
+      uploadSuccess: 'Photo de profil mise a jour.',
+      uploadError: 'Impossible de televerser la photo.'
+    },
     recommendations: {
       title: 'Recommandations pour vous',
       subtitle: 'Offres correspondant a votre profil.',
@@ -248,6 +305,25 @@ const PROFILE_COPY: Record<UiLanguage, ProfileCopy> = {
       description: 'Creez un compte ou connectez-vous pour retrouver vos extractions et mettre a? jour votre profil.',
       signup: 'Creer un compte',
       signin: 'Se connecter'
+    },
+    admin: {
+      heroEyebrow: 'Console admin',
+      heroSubtitle: 'Surveillez les comptes, debloquez les utilisateurs et renvoyez les emails de verification en un clic.',
+      quickActions: {
+        controlCenter: 'Ouvrir le control center',
+        pending: 'Voir les verifications en attente'
+      },
+      summary: {
+        total: { label: 'Utilisateurs', hint: 'Tous les comptes' },
+        active: { label: 'Actifs', hint: 'Acces autorise' },
+        blocked: { label: 'Bloques', hint: 'Acces suspendu' },
+        pending: { label: 'Email en attente', hint: 'A verifier' }
+      },
+      panels: {
+        pending: { title: 'Verifications en attente', empty: 'Aucun email a confirmer.', action: 'Gerer' },
+        blocked: { title: 'Bloques recemment', empty: 'Aucun compte bloque.' },
+        recent: { title: 'Connexions recentes', empty: 'Aucune connexion recente.' }
+      }
     }
   }
 };
@@ -273,6 +349,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   private readonly subscription = new Subscription();
   private readonly preferences = inject(UserPreferencesService);
   private readonly notifications = inject(NotificationService);
+  private readonly adminApi = inject(AdminApiService);
 
   readonly user$ = this.session.currentUser$;
 
@@ -288,6 +365,15 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   settings: UserPreferences = this.preferences.defaults;
   resumeProfile: ResumeProfile | null = null;
   resumeUploading = false;
+  photoUploading = false;
+  isAdminUser = false;
+  adminLoading = false;
+  adminError = '';
+  adminUsers: AdminUser[] = [];
+  adminPending: AdminUser[] = [];
+  adminBlocked: AdminUser[] = [];
+  adminRecent: AdminUser[] = [];
+  adminStats = { total: 0, blocked: 0, pending: 0, active: 0 };
 
   constructor() {
     this.languageService.language$
@@ -303,10 +389,18 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.user$.subscribe(user => {
         if (user) {
-          this.settings = this.preferences.get(user.id);
-          void this.fetchData();
-          void this.loadResumeData(user.id);
+          this.isAdminUser = this.session.isAdmin();
+          if (this.isAdminUser) {
+            this.settings = this.preferences.defaults;
+            this.resetData();
+            void this.loadAdminDashboard();
+          } else {
+            this.settings = this.preferences.get(user.id);
+            void this.fetchData();
+            void this.loadResumeData(user.id);
+          }
         } else {
+          this.isAdminUser = false;
           this.settings = this.preferences.defaults;
           this.resetData();
         }
@@ -319,6 +413,9 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   private async fetchData(): Promise<void> {
+    if (this.isAdminUser) {
+      return;
+    }
     const userId = this.session.getCurrentUserId();
     if (!userId) {
       this.resetData();
@@ -341,12 +438,68 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   private async loadResumeData(userId: string): Promise<void> {
+    if (this.isAdminUser) {
+      return;
+    }
     try {
       this.resumeProfile = await this.api.getResumeProfile();
+      if (this.resumeProfile && 'photoData' in this.resumeProfile) {
+        this.session.updatePhoto(this.resumeProfile.photoData ?? null);
+      } else {
+        this.session.updatePhoto(null);
+      }
     } catch (error) {
       console.error(error);
       this.resumeProfile = null;
     }
+  }
+
+  private async loadAdminDashboard(): Promise<void> {
+    this.adminLoading = true;
+    this.adminError = '';
+    try {
+      const users = await this.adminApi.listUsers();
+      this.adminUsers = users;
+      this.computeAdminHighlights(users);
+    } catch (error) {
+      console.error(error);
+      this.adminUsers = [];
+      this.adminPending = [];
+      this.adminBlocked = [];
+      this.adminRecent = [];
+      this.adminStats = { total: 0, blocked: 0, pending: 0, active: 0 };
+      this.adminError = this.text.errors.fetchFailed;
+    } finally {
+      this.adminLoading = false;
+    }
+  }
+
+  private computeAdminHighlights(users: AdminUser[]): void {
+    const blocked = users.filter(user => user.accountStatus === 'BLOCKED');
+    const pending = users.filter(user => !user.emailVerified);
+    const total = users.length;
+    const active = total - blocked.length;
+
+    this.adminStats = {
+      total,
+      blocked: blocked.length,
+      pending: pending.length,
+      active: Math.max(active, 0)
+    };
+
+    this.adminBlocked = blocked.slice(0, 4);
+    this.adminPending = pending.slice(0, 4);
+    this.adminRecent = [...users]
+      .sort((a, b) => this.toTimestamp(b.createdAt) - this.toTimestamp(a.createdAt))
+      .slice(0, 5);
+  }
+
+  private toTimestamp(value?: string | null): number {
+    if (!value) {
+      return 0;
+    }
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : 0;
   }
 
   signOut(): void {
@@ -407,11 +560,22 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     this.stats = null;
     this.recentOffers = [];
     this.resumeProfile = null;
+    this.adminUsers = [];
+    this.adminPending = [];
+    this.adminBlocked = [];
+    this.adminRecent = [];
+    this.adminStats = { total: 0, blocked: 0, pending: 0, active: 0 };
+    this.adminError = '';
+    this.adminLoading = false;
   }
 
   navigate(path: string): void {
     const target = path.startsWith('/') ? path : `/${path}`;
     this.router.navigate([target]);
+  }
+
+  goToAdminDashboard(): void {
+    this.navigate('/admin');
   }
 
   async onResumeSelected(event: Event): Promise<void> {
@@ -434,10 +598,30 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     }
   }
 
+  async onPhotoSelected(event: Event): Promise<void> {
+    const input = event.target as HTMLInputElement;
+    if (!input?.files || input.files.length === 0) {
+      return;
+    }
+    const file = input.files[0];
+    this.photoUploading = true;
+    try {
+      this.resumeProfile = await this.api.uploadProfilePhoto(file);
+      this.notifications.notify(this.text.photo.uploadSuccess, 'success', 6000);
+      this.session.updatePhoto(this.resumeProfile?.photoData ?? null);
+    } catch (error) {
+      console.error(error);
+      this.notifications.notify(this.text.photo.uploadError, 'error', 7000);
+    } finally {
+      this.photoUploading = false;
+      input.value = '';
+    }
+  }
+
   get resumeUploadNote(): string {
     return this.currentLanguage === 'fr'
-      ? 'Formats acceptés : PDF, DOCX, DOC, TXT · ≤ 5 Mo'
-      : 'Formats: PDF, DOCX, DOC, TXT · ≤ 5 MB';
+      ? "Formats acceptes : PDF, DOCX, DOC, TXT jusqu'a 5 Mo"
+      : 'Formats: PDF, DOCX, DOC, TXT up to 5 MB';
   }
 
   toggleSetting(key: keyof UserPreferences): void {
@@ -451,6 +635,28 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   private setError(key: ProfileErrorKey | null): void {
     this.lastErrorKey = key;
     this.errorMessage = key ? this.text.errors[key] : '';
+  }
+
+  formatAdminDate(value?: string | null): string {
+    if (!value) {
+      return this.currentLanguage === 'fr' ? 'Non defini' : 'No data';
+    }
+    return new Date(value).toLocaleDateString(this.dateLocale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  }
+
+  userInitials(user: { fullName?: string | null; email: string }): string {
+    if (user?.fullName) {
+      const parts = user.fullName.trim().split(/\s+/);
+      if (parts.length >= 2) {
+        return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase();
+      }
+      return parts[0].charAt(0).toUpperCase();
+    }
+    return user?.email?.charAt(0).toUpperCase() ?? '?';
   }
 
   get dateLocale(): string {

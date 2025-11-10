@@ -142,6 +142,21 @@ form {
   accent-color: #6366f1;
 }
 
+.forgot-link {
+  text-align: right;
+}
+
+.forgot-link a {
+  color: #4f46e5;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.forgot-link a:hover {
+  text-decoration: underline;
+}
+
 button {
   border: none;
   border-radius: 999px;
@@ -166,6 +181,12 @@ button:hover:not([disabled]) {
 
 .error {
   color: #f0433a;
+  margin: 0;
+  font-weight: 600;
+}
+
+.success {
+  color: #0ea5e9;
   margin: 0;
   font-weight: 600;
 }

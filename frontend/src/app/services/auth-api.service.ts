@@ -6,6 +6,14 @@ export interface AuthUser {
   id: string;
   email: string;
   fullName?: string;
+  emailVerified: boolean;
+  accountStatus: string;
+  roles: string[];
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+  accessToken: string;
 }
 
 export interface SignUpPayload {
@@ -28,7 +36,23 @@ export class AuthApiService {
     return lastValueFrom(this.http.post<AuthUser>(`${this.baseUrl}/signup`, payload));
   }
 
-  signIn(payload: SignInPayload): Promise<AuthUser> {
-    return lastValueFrom(this.http.post<AuthUser>(`${this.baseUrl}/signin`, payload));
+  signIn(payload: SignInPayload): Promise<AuthResponse> {
+    return lastValueFrom(this.http.post<AuthResponse>(`${this.baseUrl}/signin`, payload));
+  }
+
+  verifyEmail(token: string): Promise<void> {
+    return lastValueFrom(this.http.post<void>(`${this.baseUrl}/verify`, { token }));
+  }
+
+  resendVerification(email: string): Promise<void> {
+    return lastValueFrom(this.http.post<void>(`${this.baseUrl}/verify/resend`, { email }));
+  }
+
+  requestPasswordReset(email: string): Promise<void> {
+    return lastValueFrom(this.http.post<void>(`${this.baseUrl}/password/forgot`, { email }));
+  }
+
+  resetPassword(token: string, newPassword: string): Promise<void> {
+    return lastValueFrom(this.http.post<void>(`${this.baseUrl}/password/reset`, { token, newPassword }));
   }
 }
