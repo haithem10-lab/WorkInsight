@@ -86,23 +86,6 @@ mvn test
    git push
    ```
 
-> 💡 Assurez-vous d'avoir configuré vos identifiants Git (`git config user.name` et `git config user.email`) et d'utiliser une clé SSH ou un token HTTPS valide pour l'authentification auprès de GitHub.
-
-### Automatiser la synchronisation
-
-Pour éviter de retaper les commandes Git à chaque fois, un script utilitaire est disponible :
-
-```bash
-./scripts/git-sync.sh "mon message de commit"
-```
-
-- Si aucun message n'est passé en argument, le script vous le demandera.
-- Le script vérifie qu'il reste des fichiers à committer avant de pousser.
-- Assurez-vous que la télécommande `origin` pointe vers `https://github.com/<votre-compte>/WorkInsight.git` ou votre URL SSH.
-
-> ℹ️ Le script est à lancer depuis la racine du projet (là où se trouve le dossier `.git`).
-
-Pour un tutoriel détaillé (y compris le dépannage), consultez [`docs/github-publish.md`](docs/github-publish.md).
 
 ## Points suivants
 - Intégrer les modules d'extraction (OCR, parsing PDF, scraping) dans `ExtractionService`.
